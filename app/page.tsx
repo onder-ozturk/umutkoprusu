@@ -1,7 +1,7 @@
 const timelineData = [
   {
-    period: "Ocak 2026",
-    subtitle: "1. Dönem — Aralık 2025",
+    period: "Aralık 2025",
+    subtitle: "1. Dönem — Başlangıç Ayı",
     status: "completed",
     summary:
       "Proje yönetimi, gereksinim analizi ve temel teknik altyapının kurulumu",
@@ -191,7 +191,7 @@ export default function Home() {
             <div className="absolute left-3.5 top-1 w-3 h-3 rounded-full bg-gray-300 border-2 border-white ring-2 ring-gray-300" />
             <div className="flex items-center gap-3">
               <span className="text-lg font-bold text-gray-400">
-                Şubat 2026
+                Ocak 2026
               </span>
               <span className="text-sm text-gray-400">2. Dönem</span>
               <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">
