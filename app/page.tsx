@@ -1,9 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
-import { timelineDetails } from "./timelineDetails";
+import { timelineDetails, timelineDetailsRich } from "./timelineDetails";
 
 type UpgradeNote = { category: string; note: string };
-type ItemDetail = { title: string; body: string };
+type ItemDetail = {
+  title: string;
+  itemText: string;
+  category: string;
+  period: string;
+  lead: string;
+  points: string[];
+  tags: string[];
+};
 
 type TimelineEntry = {
   period: string;
@@ -706,24 +714,35 @@ function NewStamp() {
 }
 
 function getItemDetail(period: string, category: string, item: string): ItemDetail {
-  const title = `${period} • ${category}`;
+  const base = { title: `${period} • ${category}`, itemText: item, category, period };
 
+  // 1) Önce zengin format
+  if (timelineDetailsRich[item]) {
+    const r = timelineDetailsRich[item];
+    return { ...base, lead: r.lead, points: r.points, tags: r.tags };
+  }
+
+  // 2) Eski string[] formatından dönüştür
   if (timelineDetails[item]) {
+    const arr = timelineDetails[item];
     return {
-      title,
-      body: timelineDetails[item].join("\n"),
+      ...base,
+      lead: arr[0],
+      points: arr.slice(1),
+      tags: [category],
     };
   }
 
-  // Fallback (for items not found in timelineDetails map)
+  // 3) Genel fallback
   return {
-    title,
-    body: [
-      "Faaliyet: " + item,
-      "Bu madde dönem hedefinin uygulama adımını tanımlar.",
-      "Faaliyet kapsamı, sorumlular, bağımlılıklar ve kabul kriterleriyle birlikte izlenir.",
-      "Beklenen çıktı: ölçülebilir teslim ve doğrulanabilir kayıt.",
-    ].join("\n"),
+    ...base,
+    lead: "Bu faaliyet dönem hedeflerinin uygulama adımını tanımlar ve sorumlu ekiplerce periyodik olarak doğrulanır.",
+    points: [
+      "Faaliyet kapsamı, sorumlular ve bağımlılıklar ekip içi görev dağılımıyla netleştirildi.",
+      "İlerleme metrikleri ve kabul kriterleri ölçülebilir formatta tanımlandı.",
+      "Beklenen çıktılar doğrulanabilir kayıt formatında sisteme işlendi.",
+    ],
+    tags: [category],
   };
 }
 export default function Home() {
@@ -1056,34 +1075,88 @@ export default function Home() {
       </div>{/* end right side */}
 
       {activeDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6">
+          {/* Backdrop */}
           <button
             type="button"
-            className="absolute inset-0 bg-black/50"
+            className="detail-backdrop absolute inset-0 bg-slate-900/60 backdrop-blur-sm cursor-default"
             onClick={() => setActiveDetail(null)}
-            aria-label="Detay penceresini kapat"
+            aria-label="Kapat"
           />
+
+          {/* Modal Card */}
           <div
             role="dialog"
             aria-modal="true"
-            aria-label={activeDetail.title}
-            className="relative z-10 w-full max-w-2xl rounded-xl border border-slate-200 bg-white shadow-2xl"
+            aria-label={activeDetail.itemText}
+            className="detail-popup relative z-10 w-full sm:max-w-xl rounded-t-2xl sm:rounded-2xl bg-white shadow-[0_32px_72px_-8px_rgba(0,0,0,0.28),0_0_0_1px_rgba(0,0,0,0.06)] overflow-hidden"
           >
-            <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">Madde Detayı</p>
-                <h4 className="text-sm font-semibold text-slate-800">{activeDetail.title}</h4>
+            {/* Gradient accent bar */}
+            <div className="h-1 w-full bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500" />
+
+            {/* Header */}
+            <div className="flex items-start gap-3 px-5 pt-4 pb-3.5 border-b border-slate-100">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-sky-100 text-sky-700">
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0" />
+                    {activeDetail.category}
+                  </span>
+                  <span className="text-[11px] text-slate-400 font-medium">{activeDetail.period}</span>
+                </div>
+                <h4 className="text-sm font-semibold text-slate-800 leading-snug">
+                  {activeDetail.itemText}
+                </h4>
               </div>
               <button
                 type="button"
                 onClick={() => setActiveDetail(null)}
-                className="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50"
+                className="shrink-0 mt-0.5 flex items-center justify-center w-8 h-8 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                aria-label="Kapat"
               >
-                Kapat
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
-            <div className="max-h-[65vh] overflow-y-auto px-4 py-4">
-              <p className="whitespace-pre-line text-sm leading-6 text-slate-700">{activeDetail.body}</p>
+
+            {/* Body */}
+            <div className="px-5 py-4 max-h-[65vh] overflow-y-auto space-y-4">
+              {/* Lead */}
+              <p className="text-sm leading-relaxed text-slate-700 bg-gradient-to-br from-sky-50 to-indigo-50 border border-sky-100 rounded-xl px-4 py-3">
+                {activeDetail.lead}
+              </p>
+
+              {/* Points */}
+              {activeDetail.points.length > 0 && (
+                <ul className="space-y-2.5">
+                  {activeDetail.points.map((point, i) => (
+                    <li key={i} className="flex gap-3 text-sm text-slate-700 leading-relaxed">
+                      <span className="mt-0.5 shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-sky-100">
+                        <svg className="w-3 h-3 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </span>
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {/* Tags */}
+              {activeDetail.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-1 border-t border-slate-100">
+                  {activeDetail.tags.map((tag, i) => (
+                    <span
+                      key={i}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-medium rounded-full bg-slate-100 text-slate-600"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0" />
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

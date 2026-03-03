@@ -182,3 +182,159 @@ export const timelineDetails: Record<string, string[]> = {
   "24 ayda ulaşılan kullanıcı, kurum ve ülke sayısı raporlandı": ["Faaliyet: 24 ayda ulaşılan kullanıcı, kurum ve ülke sayısı raporlandı", "Bu adımda ürünün hizmet edeceği kullanıcı kitlesi (öğrenciler, uzmanlar) ve paydaşların beklentileri analiz edilir.", "Gereksinimler, pazarın temel ihtiyaçları doğrultusunda işlevsel kullanım senaryolarına (MVP) indirgenir.", "Böylelikle projenin kapsamı daraltılarak daha hızlı ve etkili bir başlangıç sağlanır."],
   "Platforma erişemeyen risk grupları için sonraki adım önerileri": ["Faaliyet: Platforma erişemeyen risk grupları için sonraki adım önerileri", "Bu aşamada risk seviyelerinin (düşük, orta, yüksek) doğru şekilde kategorize edilmesi hedeflenmiştir.", "Risk hesaplaması, manuel değerlendirme yerine standardize edilmiş triyaj algoritmalarına dayandırılır.", "Böylece uzmanların kritik vakalara ulaşım süresi ve klinik başarı oranı artırılır."],
 };
+
+/* ─────────────────────────────────────────────────────────────────
+   Zenginleştirilmiş popup verileri  (lead · points · tags)
+   Şu an yalnızca Aralık 2025 — 12 madde tanımlı.
+   ───────────────────────────────────────────────────────────────── */
+export type RichDetail = {
+  lead: string;
+  points: string[];
+  tags: string[];
+};
+
+export const timelineDetailsRich: Record<string, RichDetail> = {
+
+  /* ── Klinik Çerçeve ──────────────────────────────────────────── */
+
+  "PHQ-9, GAD-7 ve C-SSRS/ASQ'nun Türk üniversite öğrencileri için kullanım ilkeleri belirlendi": {
+    lead: "PHQ-9 (depresyon), GAD-7 (anksiyete) ve C-SSRS/ASQ (intihar riski) ölçeklerinin Türk üniversite öğrencileri bağlamında nasıl ve hangi sınırlılıklar çerçevesinde uygulanacağına dair kapsamlı operasyonel ilkeler tanımlandı. İlkeler; psikometrik kısıtlar, gizlilik yükümlülükleri ve eskalasyon protokollerini bir arada ele almaktadır.",
+    points: [
+      "PHQ-9 ve GAD-7 yalnızca tarama amaçlıdır; tanısal kesinlik sağlamaz ve klinik görüşmeyle desteklenmedikçe tek başına karar vermek için kullanılamaz.",
+      "C-SSRS/ASQ intihar ideasyonunu erken tespit etmek için kullanılır; herhangi bir aktif ideasyonda klinisyen eskalasyonu otomatik tetiklenir ve gecikmeye yer bırakılmaz.",
+      "Ölçekler, Türk popülasyonu için geçerlik-güvenilirliği kanıtlanmış Türkçe formlarıyla uygulanır; akademik baskı dönemleri (sınav, sene sonu) yorumlamada ayrıca dikkate alınır.",
+      "Tüm ölçek verileri uçtan uca şifrelenmiş altyapıda saklanır; yalnızca yetkili klinik ekip erişebilir, üçüncü şahıslarla hiçbir koşulda paylaşılmaz.",
+      "Yüksek skor alan her kullanıcı için otomatik klinik görüşme daveti oluşturulur; yalnızca skora bakılarak otomatik tanı veya etiket atanmaz.",
+    ],
+    tags: ["PHQ-9", "GAD-7", "C-SSRS/ASQ", "Klinik Protokol", "Tarama İlkeleri"],
+  },
+
+  "Risk eşik değerleri ve uyarı akışları klinisyen danışmanlarla birlikte taslaklandı": {
+    lead: "Depresyon ve anksiyete ölçek puanlarını düşük / orta / yüksek risk kategorilerine dönüştüren sayısal eşikler, psikiyatrist ve klinik psikolog danışmanlarla ortak çalışma oturumlarında belirlendi. Her eşik kademesine bağlı bildirim ve eskalasyon akışları, kurumun klinisyen kapasitesiyle uyumlu biçimde taslaklandı.",
+    points: [
+      "PHQ-9: ≤4 minimal · 5–9 düşük · 10–14 orta · 15–19 yüksek · ≥20 şiddetli — beş kategori danışman paneliyle onaylandı.",
+      "GAD-7: ≤4 minimal · 5–9 hafif · 10–14 orta · ≥15 yüksek risk eşikleri klinisyen geri bildirimleriyle kalibre edildi.",
+      "Eşik aşımında sistem ≤2 saat içinde sorumlu klinisyene push bildirimi iletir; kritik (yüksek risk) durumlarda bildirim anlık ve SMS desteği ile pekiştirilir.",
+      "Uyarı akışları mesai saatlerine göre özelleştirilebilir: mesai dışında yüksek risk tespitinde nöbetçi klinisyen devreye girer.",
+      "Eşik değerleri pilot verilerinden elde edilecek geri bildirimlerle dinamik olarak revize edilebilecek modüler yapıda tasarlandı.",
+    ],
+    tags: ["Risk Eşiği", "Uyarı Akışı", "Triyaj", "Klinisyen", "Bildirim Protokolü"],
+  },
+
+  "Düşük–orta–yüksek risk için müdahale yolları tanımlandı": {
+    lead: "Üç risk kademesine göre kullanıcıya sunulacak destek türleri, içerikler ve yönlendirme adımları ayrıntılı biçimde tanımlandı. Müdahale yolları; klinisyen iş yükünü optimize ederken her kullanıcıya uygun düzeyde destek sağlayacak şekilde tasarlandı ve etik kurul onaylı protokollerle uyumlu hâle getirildi.",
+    points: [
+      "Düşük risk (PHQ-9 <10 · GAD-7 <10): öz-yardım psikoeğitim modüllerine yönlendirme; klinisyen müdahalesi opsiyonel, 4 hafta sonra ölçek tekrarı planlanıyor.",
+      "Orta risk (PHQ-9 10–14 · GAD-7 10–14): randevu talebi formu otomatik açılır; sorumlu klinisyen 24 saat içinde bilgilendirilir; CBT tabanlı kısa müdahale modülü başlatılır.",
+      "Yüksek risk (PHQ-9 ≥15 · GAD-7 ≥15 · ya da C-SSRS pozitif): anlık klinisyen bildirimi gönderilir; güvenlik planı şablonu kullanıcıya sunulur; 112, Alo 183 ve MHRS bağlantıları ekranda belirgin gösterilir.",
+      "Her müdahale adımı klinik kayıt sistemine otomatik işlenir; takip edilebilirlik ve hesap verebilirlik güvence altına alınır.",
+      "Müdahale yolları kurumun mevcut klinik süreçlerine entegre edilebilir modüler yapıdadır; tek boyutlu zorunlu akış dayatılmaz.",
+    ],
+    tags: ["Müdahale Yolu", "Risk Kademeleri", "Düşük/Orta/Yüksek Risk", "Triyaj", "Eskalasyon"],
+  },
+
+  /* ── Paydaş & Kullanıcı Analizi ─────────────────────────────── */
+
+  "Hedef gruplar netleştirildi: üniversite öğrencisi, klinisyen, kurum yöneticisi": {
+    lead: "Platformun birincil ve ikincil kullanıcı grupları ile bu grupların birbirinden farklı ihtiyaçları, beklentileri ve teknik yetkinlikleri detaylı biçimde analiz edildi. Her kullanıcı grubuna özgü deneyim tasarım gereksinimleri çerçevesi oluşturularak MVP öncelikleri buna göre hizalandı.",
+    points: [
+      "Öğrenci: stigmasız anonim tarama, anlaşılır geri bildirim dili, kolay randevu ve kriz anında hızlı acil yönlendirme.",
+      "Klinisyen: danışan risk listesi, skor zaman serisi, güvenli asenkron mesajlaşma, seans notu oluşturma ve eskalasyon araçları.",
+      "Kurum yöneticisi: anonim aggregat raporlar, risk dağılımı istatistikleri, klinisyen iş yükü metrikleri ve maliyet-etkinlik göstergeleri.",
+      "Her grup için ayrı kullanıcı hikâyesi (user story) ve öncelikli özellik listesi oluşturuldu; MVP kapsamı bu analize dayandırıldı.",
+    ],
+    tags: ["Paydaş Analizi", "Kullanıcı Grupları", "UX Gereksinim", "MVP"],
+  },
+
+  "Kullanıcı akışları ve kullanım senaryoları oluşturuldu": {
+    lead: "Üç kullanıcı grubunun platforma ilk girişten çıkışa kadar izleyeceği tüm adımlar akış diyagramları ve kullanım senaryolarıyla (use cases) belgelendi. Bu akışlar, ekranlar ve geçişler arasındaki mantık bağlantılarını açıkça ortaya koyarak tasarım ve geliştirme sürecine yön vermektedir.",
+    points: [
+      "Tarama akışı: kayıt → bilgilendirilmiş onam → PHQ-9/GAD-7 doldurma → anlık puan + risk kategorisi → içerik veya yönlendirme.",
+      "Klinisyen akışı: bildirimleri gör → danışan profilini aç → skor geçmişi → not ekle → randevu planla.",
+      "Kriz akışı: C-SSRS pozitif → güvenlik planı ekranı → anlık klinisyen bildirimi → acil hat linkleri (112 / Alo 183 / MHRS).",
+      "Yönetici akışı: aggregat rapor paneli → tarih filtresi → risk dağılımı grafiği → CSV/PDF dışa aktarma.",
+    ],
+    tags: ["Kullanıcı Akışı", "Use Case", "UX", "Senaryo Tasarımı"],
+  },
+
+  "Erişilebilirlik ve çok dilli kullanım ihtiyaçları belirlendi": {
+    lead: "Platformun WCAG 2.1 AA erişilebilirlik standartlarını karşılaması ve ilerleyen fazlarda çok dilli kullanımı desteklemesi için teknik ve içerik gereksinimleri belirlendi. Türkçe öncelikli olmak üzere İngilizce, Arapça ve Türkî dil ailesi için genişleme yol haritası oluşturuldu.",
+    points: [
+      "WCAG 2.1 AA uyumu hedeflendi: renk kontrastı oranı ≥4.5:1, ekran okuyucu (ARIA) desteği, tam klavye navigasyonu ve odak yönetimi gereksinimleri tanımlandı.",
+      "Arapça için RTL (sağdan sola) arayüz desteği; Türkî diller için yazı sistemi ve font uyumluluğu gereksinimleri analiz edildi.",
+      "Psikometrik ölçeklerin kültürel norm adaptasyonu: farklı popülasyonlar için yerel geçerlik çalışmasına ihtiyaç duyulan ölçek ve eşikler listelendi.",
+      "i18n altyapısı baştan modüler tasarlandı; yeni dil eklenmesi minimum geliştirme maliyetiyle mümkün olacak yapıda kurgulandı.",
+    ],
+    tags: ["WCAG 2.1 AA", "Erişilebilirlik", "Çok Dilli", "i18n / RTL"],
+  },
+
+  /* ── Etik & Düzenleyici Hazırlık ────────────────────────────── */
+
+  "Etik kurul başvurusu için onam formları ve araştırma protokolü hazırlandı": {
+    lead: "Araştırmanın üniversite etik kuruluna sunulabilmesi için gereken tüm belgeler hazırlandı: katılımcı aydınlatılmış onam formları, veri toplama prosedürleri, gizlilik taahhütleri ve araştırma protokolü. Belgeler, ulusal etik kurul gereklilikleri ve Dünya Tıp Birliği Helsinki Bildirgesi doğrultusunda yapılandırıldı.",
+    points: [
+      "Aydınlatılmış onam formu: araştırmanın amacı, katılım koşulları, gizlilik güvenceleri ve geri çekilme hakkı açık ve yalın Türkçe ile hazırlandı.",
+      "Araştırma protokolü: örneklem büyüklüğü (n≥200 öğrenci), veri toplama yöntemi, analiz planı ve olası riskler etik kurul formatında belgelendi.",
+      "Dijital onam akışı tasarlandı: kullanıcı formu okuyup onaylamadan sisteme kayıt tamamlanamayacak şekilde teknik zorunluluk eklendi.",
+      "Etik kurul başvuru paketi tamamlandı ve kurul gündemi için yetkili üniversite birimine teslim edildi; takip tarihleri belirlendi.",
+    ],
+    tags: ["Etik Kurul", "Onam Formu", "Araştırma Protokolü", "Helsinki Bildirgesi"],
+  },
+
+  "KVKK/GDPR çerçevesinde kişisel sağlık verisi işleme politikası taslaklandı": {
+    lead: "6698 sayılı KVKK ve AB GDPR kapsamında, hassas kategori olan kişisel sağlık verilerinin toplanması, işlenmesi, saklanması ve silinmesine ilişkin kapsamlı bir politika hazırlandı. Politika; veri minimizasyonu, açık rıza ve ihlal bildirimi yükümlülüklerini bir arada ele almaktadır.",
+    points: [
+      "Veri minimizasyonu: yalnızca klinik değerlendirme için zorunlu olan minimum veri toplanır; demografik bilgiler anonim tutulur.",
+      "Açık rıza mekanizması: her veri kategorisi için ayrı, geri alınabilir rıza akışı tasarlandı; onay kaydı denetim izinde (audit log) saklanır.",
+      "Teknik önlemler: AES-256 depoda şifreleme, TLS 1.3 iletimde şifreleme, rol tabanlı erişim kontrolü (RBAC) ve veri maskeleme tanımlandı.",
+      "Veri saklama süreleri KVKK md. 7 ve sağlık mevzuatı gereklilikleriyle uyumlu belirlendi; otomatik anonimleştirme/silme mekanizması planlandı.",
+    ],
+    tags: ["KVKK", "GDPR", "Veri Politikası", "Gizlilik", "Veri Minimizasyonu"],
+  },
+
+  "Veri envanteri ve şifreleme gereksinimleri belirlendi": {
+    lead: "Sistemin işleyeceği tüm kişisel ve klinik veri türleri envanteri çıkarıldı; her kategori için saklama, iletim ve erişim güvenliği gereksinimleri belirlendi. Bu envanter, mimari kararlar ve güvenlik testleri için referans doküman işlevi görmektedir.",
+    points: [
+      "Veri sınıfları tanımlandı: kimlik (e-posta, kullanıcı adı), klinik (ölçek puanları, risk kategorisi), klinisyen notları ve yönetici aggregat verileri.",
+      "İletimde TLS 1.3, depoda AES-256 şifreleme zorunlu kılındı; şifreleme anahtarı yönetimi için HSM veya bulut KMS kullanımı planlandı.",
+      "RBAC ile erişim sınırlandırıldı: öğrenci yalnızca kendi verisini, klinisyen yalnızca danışanlarını, yönetici yalnızca anonim aggregat veriyi görebilir.",
+      "Veri ihlali bildirimi prosedürü KVKK'nın 72 saatlik bildirim yükümlülüğüne uygun biçimde belgelendi ve sorumlu ekiplere atandı.",
+    ],
+    tags: ["Veri Envanteri", "AES-256 / TLS 1.3", "RBAC", "Güvenlik Mimarisi"],
+  },
+
+  /* ── Ürün & Pazar Stratejisi ─────────────────────────────────── */
+
+  "MVP kapsamı netleştirildi: tarama → triyaj → yönlendirme → uzman paneli": {
+    lead: "Ürünün piyasaya sürülecek ilk işlevsel versiyonunun (MVP) kapsamı, dört temel modüle indirgenerek net biçimde tanımlandı. Bu seçim; en kritik değer zincirini en kısa sürede doğrulamayı ve klinisyen onayı almayı önceliklendirmektedir.",
+    points: [
+      "Tarama modülü: PHQ-9, GAD-7 ve C-SSRS/ASQ'nun dijital uygulaması; anlık otomatik puanlama ve risk kategorisi üretimi.",
+      "Triyaj motoru: risk puanını düşük/orta/yüksek kategorisine çeviren kural tabanlı motor; özelleştirilebilir eşik değerleri ve kurumsal yapılandırma.",
+      "Yönlendirme akışı: risk kategorisine göre kullanıcıyı öz-yardım içeriğine, randevu talebine veya acil kaynaklara yönlendiren otomatik akış.",
+      "Uzman paneli: klinisyenin danışan listesini, skor geçmişini ve bildirimleri yönettiği minimal ama tam işlevsel yönetim arayüzü.",
+    ],
+    tags: ["MVP", "Ürün Kapsamı", "Tarama → Triyaj → Yönlendirme", "Uzman Paneli"],
+  },
+
+  "İlk hedef pazar belirlendi: üniversite psikolojik danışmanlık merkezleri": {
+    lead: "Ürünün ilk piyasaya çıkış hedef kitlesi olarak üniversite Psikolojik Danışmanlık ve Rehberlik Merkezleri (PDRAM) seçildi. Bu seçim; yüksek öğrenci yoğunluğu, standartlaşmış klinik süreçler ve dijital araçlara kurumsal açıklık gibi kriterlere dayandırıldı.",
+    points: [
+      "Türkiye'de 200'den fazla üniversitede PDRAM bulunmakta; bu merkezler yıllık yaklaşık 500.000 öğrenciye hizmet vermektedir.",
+      "Klinisyen başına düşen öğrenci sayısı ≥800 olduğundan dijital triyaj araçlarına yönelik kurumsal talep yapısal olarak yüksektir.",
+      "YÖK denetim çerçevesi nedeniyle bir üniversitede başarılı pilot, diğerleri için güçlü referans işlevi görerek satış döngüsünü anlamlı ölçüde kısaltır.",
+      "İlk müşteri profili: öğrenci sayısı ≥10.000, aktif klinisyen sayısı ≥3, dijital süreç açıklığı yüksek ve rektörlük desteği olan üniversiteler.",
+    ],
+    tags: ["Hedef Pazar", "PDRAM", "B2B SaaS", "Pazar Stratejisi"],
+  },
+
+  "24 aylık proje yol haritası ve kilometre taşları onaylandı": {
+    lead: "AffectLog-TR'nin Aralık 2025–Kasım 2027 dönemini kapsayan 24 aylık yol haritası, 6 faz hâlinde yapılandırılarak ekip, danışman ve paydaş onayına sunuldu. Kilometre taşları hem teknik çıktılara hem de ölçülebilir klinik etki metriklerine bağlandı.",
+    points: [
+      "Faz 1–2 (Ara 2025–Tem 2026): klinik çerçeve, etik altyapı, klinik içerik geliştirme ve MVP platformunun tamamlanması.",
+      "Faz 3 (Ağu–Eki 2026): MVP alfa/beta testleri, SUS ≥75 kullanılabilirlik hedefi ve kriz protokolü güvenlik doğrulaması.",
+      "Faz 4 (Kas 2026–Oca 2027): 2+ üniversitede çok merkezli pilot; ΔPHQ-9/ΔGAD-7 etki ölçümü ve hakemli makale taslağı.",
+      "Faz 5–6 (Şub–Kas 2027): kurumsal genişleme, uluslararası pilot, ISO 27001 sertifikasyonu, patent başvuruları ve ≥1.000 aktif kullanıcı hedefi.",
+    ],
+    tags: ["Yol Haritası", "6 Faz", "Kilometre Taşları", "Proje Planı"],
+  },
+};
