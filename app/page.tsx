@@ -12,1143 +12,757 @@ type TimelineEntry = {
   outputs: string[];
 };
 
+const phases = [
+  { name: "Faz 1 — Temel",                range: "Ara 2025 – Şub 2026" },
+  { name: "Faz 2 — Çekirdek Geliştirme",  range: "Mar 2026 – Tem 2026" },
+  { name: "Faz 3 — MVP",                  range: "Ağu 2026 – Eki 2026" },
+  { name: "Faz 4 — Pilot",                range: "Kas 2026 – Oca 2027" },
+  { name: "Faz 5 — Kurumsal Entegrasyon", range: "Şub 2027 – May 2027" },
+  { name: "Faz 6 — İhracat & Ölçek",      range: "Haz 2027 – Kas 2027" },
+];
+
+const phaseStyle: Record<string, { bg: string; text: string; dot: string; border: string }> = {
+  "Faz 1 — Temel":                { bg: "bg-purple-50",  text: "text-purple-700", dot: "bg-purple-500",  border: "border-purple-200" },
+  "Faz 2 — Çekirdek Geliştirme":  { bg: "bg-blue-50",    text: "text-blue-700",   dot: "bg-blue-500",    border: "border-blue-200"   },
+  "Faz 3 — MVP":                  { bg: "bg-cyan-50",    text: "text-cyan-700",   dot: "bg-cyan-500",    border: "border-cyan-200"   },
+  "Faz 4 — Pilot":                { bg: "bg-green-50",   text: "text-green-700",  dot: "bg-green-500",   border: "border-green-200"  },
+  "Faz 5 — Kurumsal Entegrasyon": { bg: "bg-orange-50",  text: "text-orange-700", dot: "bg-orange-500",  border: "border-orange-200" },
+  "Faz 6 — İhracat & Ölçek":      { bg: "bg-rose-50",    text: "text-rose-700",   dot: "bg-rose-500",    border: "border-rose-200"   },
+};
+
 const timelineData: TimelineEntry[] = [
-  /* ─── AY 1 ─── */
   {
-    period: "Aralık 2025",
-    subtitle: "1. Dönem",
-    status: "completed",
-    phase: "Faz 1 — Temel",
+    period: "Aralık 2025", subtitle: "1. Dönem", status: "completed", phase: "Faz 1 — Temel",
     summary: "Projenin klinik temelleri, paydaş analizi ve araştırma çerçevesinin oluşturulması",
     items: [
-      {
-        category: "Klinik Çerçeve",
-        items: [
-          "PHQ-9, GAD-7 ve C-SSRS/ASQ'nun Türk üniversite öğrencileri için kullanım ilkeleri belirlendi",
-          "Risk eşik değerleri ve uyarı akışları klinisyen danışmanlarla birlikte taslaklandı",
-          "Düşük–orta–yüksek risk için müdahale yolları tanımlandı",
-        ],
-      },
-      {
-        category: "Paydaş & Kullanıcı Analizi",
-        items: [
-          "Hedef gruplar netleştirildi: üniversite öğrencisi, klinisyen, kurum yöneticisi",
-          "Kullanıcı akışları ve kullanım senaryoları (danışan / uzman / yönetici) oluşturuldu",
-          "Erişilebilirlik ve çok dilli kullanım (WCAG 2.1, i18n) ihtiyaçları belirlendi",
-        ],
-      },
-      {
-        category: "Etik & Düzenleyici Hazırlık",
-        items: [
-          "Etik kurul başvurusu için onam formları ve araştırma protokolü hazırlandı",
-          "KVKK/GDPR çerçevesinde kişisel sağlık verisi işleme politikası taslaklandı",
-          "Veri envanteri ve şifreleme gereksinimleri belirlendi",
-        ],
-      },
-      {
-        category: "Ürün & Pazar Stratejisi",
-        items: [
-          "MVP kapsamı netleştirildi: tarama → triyaj → yönlendirme → uzman paneli",
-          "İlk hedef pazar belirlendi: üniversite psikolojik danışmanlık merkezleri",
-          "24 aylık proje yol haritası ve kilometre taşları onaylandı",
-        ],
-      },
+      { category: "Klinik Çerçeve", items: [
+        "PHQ-9, GAD-7 ve C-SSRS/ASQ'nun Türk üniversite öğrencileri için kullanım ilkeleri belirlendi",
+        "Risk eşik değerleri ve uyarı akışları klinisyen danışmanlarla birlikte taslaklandı",
+        "Düşük–orta–yüksek risk için müdahale yolları tanımlandı",
+      ]},
+      { category: "Paydaş & Kullanıcı Analizi", items: [
+        "Hedef gruplar netleştirildi: üniversite öğrencisi, klinisyen, kurum yöneticisi",
+        "Kullanıcı akışları ve kullanım senaryoları oluşturuldu",
+        "Erişilebilirlik ve çok dilli kullanım ihtiyaçları belirlendi",
+      ]},
+      { category: "Etik & Düzenleyici Hazırlık", items: [
+        "Etik kurul başvurusu için onam formları ve araştırma protokolü hazırlandı",
+        "KVKK/GDPR çerçevesinde kişisel sağlık verisi işleme politikası taslaklandı",
+        "Veri envanteri ve şifreleme gereksinimleri belirlendi",
+      ]},
+      { category: "Ürün & Pazar Stratejisi", items: [
+        "MVP kapsamı netleştirildi: tarama → triyaj → yönlendirme → uzman paneli",
+        "İlk hedef pazar belirlendi: üniversite psikolojik danışmanlık merkezleri",
+        "24 aylık proje yol haritası ve kilometre taşları onaylandı",
+      ]},
     ],
     pending: [
       "Etik kurul onayı — süreç devam ediyor",
       "Gerçek hasta verisiyle doğrulama — etik onay bekleniyor",
       "FHIR/USVS canlı entegrasyon — kurumsal erişim yetkileri bekleniyor",
     ],
-    outputs: [
-      "Araştırma Protokolü v1",
-      "Etik Kurul Başvuru Paketi",
-      "Ürün Gereksinim Dokümanı (SRS v0.2)",
-      "24 Aylık Yol Haritası",
-      "KVKK Veri İşleme Politikası",
-      "Kullanıcı Akış Diyagramları",
-    ],
+    outputs: ["Araştırma Protokolü v1", "Etik Kurul Başvuru Paketi", "SRS v0.2", "24 Aylık Yol Haritası", "KVKK Politikası", "Kullanıcı Akış Diyagramları"],
   },
-
-  /* ─── AY 2 ─── */
   {
-    period: "Ocak 2026",
-    subtitle: "2. Dönem",
-    status: "ongoing",
-    phase: "Faz 1 — Temel",
+    period: "Ocak 2026", subtitle: "2. Dönem", status: "ongoing", phase: "Faz 1 — Temel",
     summary: "Klinik içerik geliştirme, uzman danışman ağı kurulumu ve tasarım doğrulama",
     items: [
-      {
-        category: "Klinik İçerik Geliştirme",
-        items: [
-          "Düşük risk için psikoeğitim içerikleri (anksiyete yönetimi, stres azaltma) hazırlanıyor",
-          "Orta risk için CBT tabanlı kısa müdahale modülleri taslaklanıyor",
-          "Kriz anında kullanıcıya sunulacak güvenlik planı şablonu oluşturuluyor",
-        ],
-      },
-      {
-        category: "Uzman Danışman Ağı",
-        items: [
-          "Psikiyatri, klinik psikoloji ve ölçme-değerlendirme alanlarında danışmanlar belirleniyor",
-          "Üniversite psikolojik danışmanlık merkezi koordinatörleriyle görüşmeler yapılıyor",
-          "Klinisyen geri bildirimiyle triyaj eşik değerleri revize ediliyor",
-        ],
-      },
-      {
-        category: "Kullanıcı Araştırması",
-        items: [
-          "Üniversite öğrencileriyle odak grup görüşmeleri (n=15) gerçekleştiriliyor",
-          "Mevcut psikolojik destek süreçlerindeki boşluklar ve bariyer analizi yapılıyor",
-          "Düşük seviye prototip (wireframe) kullanıcı testi yapılıyor",
-        ],
-      },
+      { category: "Klinik İçerik Geliştirme", items: [
+        "Düşük risk için psikoeğitim içerikleri (anksiyete yönetimi, stres azaltma) hazırlanıyor",
+        "Orta risk için CBT tabanlı kısa müdahale modülleri taslaklanıyor",
+        "Kriz anında kullanıcıya sunulacak güvenlik planı şablonu oluşturuluyor",
+      ]},
+      { category: "Uzman Danışman Ağı", items: [
+        "Psikiyatri, klinik psikoloji ve ölçme-değerlendirme alanlarında danışmanlar belirleniyor",
+        "Üniversite psikolojik danışmanlık merkezi koordinatörleriyle görüşmeler yapılıyor",
+        "Klinisyen geri bildirimiyle triyaj eşik değerleri revize ediliyor",
+      ]},
+      { category: "Kullanıcı Araştırması", items: [
+        "Üniversite öğrencileriyle odak grup görüşmeleri (n=15) gerçekleştiriliyor",
+        "Mevcut psikolojik destek süreçlerindeki boşluklar analiz ediliyor",
+        "Düşük seviye prototip (wireframe) kullanıcı testi yapılıyor",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "Klinik İçerik Kütüphanesi v0.1",
-      "Danışman Ağı Listesi",
-      "Kullanıcı Araştırma Raporu",
-      "Triyaj Eşik Değer Belgesi v1",
-    ],
+    outputs: ["Klinik İçerik Kütüphanesi v0.1", "Danışman Ağı Listesi", "Kullanıcı Araştırma Raporu", "Triyaj Eşik Değer Belgesi v1"],
   },
-
-  /* ─── AY 3 ─── */
   {
-    period: "Şubat 2026",
-    subtitle: "3. Dönem",
-    status: "planned",
-    phase: "Faz 1 — Temel",
+    period: "Şubat 2026", subtitle: "3. Dönem", status: "planned", phase: "Faz 1 — Temel",
     summary: "Etik kurul onayı süreci, pilot kurum ortaklıkları ve klinik içeriklerin tamamlanması",
     items: [
-      {
-        category: "Etik Süreç",
-        items: [
-          "Etik kurul başvurusunun takibi ve gerekli revizyon yanıtları",
-          "Bilgilendirilmiş onam sürecinin dijital platforma entegrasyon tasarımı",
-          "Veri güvenliği protokolünün etik kurul gereksinimlerine göre güncellenmesi",
-        ],
-      },
-      {
-        category: "Pilot Kurum Ortaklıkları",
-        items: [
-          "En az 3 üniversite psikolojik danışmanlık merkezi ile ön görüşmeler",
-          "Pilot protokol ve gizlilik sözleşmesi müzakereleri",
-          "Kurum yöneticisi ihtiyaç analizi anketinin uygulanması",
-        ],
-      },
-      {
-        category: "Klinik İçerik Tamamlama",
-        items: [
-          "Psikoeğitim modülleri klinisyen incelemesinden geçirildi",
-          "CBT temelli ödevler ve takip egzersizleri hazırlandı",
-          "İçerik erişilebilirlik ve okuma düzeyi denetimi yapıldı",
-        ],
-      },
+      { category: "Etik Süreç", items: [
+        "Etik kurul başvurusunun takibi ve gerekli revizyon yanıtları",
+        "Bilgilendirilmiş onam sürecinin dijital platforma entegrasyon tasarımı",
+        "Veri güvenliği protokolünün etik kurul gereksinimlerine göre güncellenmesi",
+      ]},
+      { category: "Pilot Kurum Ortaklıkları", items: [
+        "En az 3 üniversite psikolojik danışmanlık merkezi ile ön görüşmeler",
+        "Pilot protokol ve gizlilik sözleşmesi müzakereleri",
+        "Kurum yöneticisi ihtiyaç analizi anketinin uygulanması",
+      ]},
+      { category: "Klinik İçerik Tamamlama", items: [
+        "Psikoeğitim modülleri klinisyen incelemesinden geçirildi",
+        "CBT temelli ödevler ve takip egzersizleri hazırlandı",
+        "İçerik erişilebilirlik ve okuma düzeyi denetimi yapıldı",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "Etik Kurul Onayı (beklenen)",
-      "Pilot Kurum Ön Mutabakat Mektupları",
-      "Klinik İçerik Kütüphanesi v1.0",
-      "Kurum İhtiyaç Analizi Raporu",
-    ],
+    outputs: ["Etik Kurul Onayı (beklenen)", "Pilot Kurum Mutabakat Mektupları", "Klinik İçerik Kütüphanesi v1.0", "Kurum İhtiyaç Analizi Raporu"],
   },
-
-  /* ─── AY 4 ─── */
   {
-    period: "Mart 2026",
-    subtitle: "4. Dönem",
-    status: "planned",
-    phase: "Faz 2 — Çekirdek Geliştirme",
+    period: "Mart 2026", subtitle: "4. Dönem", status: "planned", phase: "Faz 2 — Çekirdek Geliştirme",
     summary: "Tarama ve triyaj modüllerinin kullanıcıyla doğrulanması, risk rozetleri ve yönlendirme akışı",
     items: [
-      {
-        category: "Tarama Modülü Doğrulama",
-        items: [
-          "PHQ-9 ve GAD-7 dijital formlarının klinisyen ve kullanıcıyla test edilmesi",
-          "Mobil ve web ortamında doldurma süresi ve bırakma noktası analizi",
-          "Otomatik puanlama ve renk kodlu geri bildirim (kullanıcı dostu) tasarımı",
-        ],
-      },
-      {
-        category: "Triyaj & Yönlendirme",
-        items: [
-          "Risk rozetleri ve risk düzeyi açıklamaları (kullanıcı için anlaşılır dil)",
-          "Düşük risk: öz-yardım içeriğe yönlendirme akışı",
-          "Orta risk: randevu talep ve klinisyene bildirim akışı",
-          "Yüksek risk: 112 / MHRS / Alo 183'e güvenli yönlendirme akışı",
-        ],
-      },
-      {
-        category: "İntihar Riski Protokolü",
-        items: [
-          "C-SSRS/ASQ akışı psikiyatrist danışmanla gözden geçirildi",
-          "Kriz güvenlik planı şablonu platforma entegre edildi",
-          "Yüksek risk durumunda klinisyene anlık bildirim protokolü test edildi",
-        ],
-      },
+      { category: "Tarama Modülü Doğrulama", items: [
+        "PHQ-9 ve GAD-7 dijital formlarının klinisyen ve kullanıcıyla test edilmesi",
+        "Mobil ve web ortamında doldurma süresi ve bırakma noktası analizi",
+        "Otomatik puanlama ve renk kodlu geri bildirim tasarımı",
+      ]},
+      { category: "Triyaj & Yönlendirme", items: [
+        "Risk rozetleri ve risk düzeyi açıklamaları (kullanıcı dostu dil)",
+        "Düşük risk: öz-yardım içeriğe yönlendirme akışı",
+        "Orta risk: randevu talep ve klinisyene bildirim akışı",
+        "Yüksek risk: 112 / MHRS / Alo 183'e güvenli yönlendirme akışı",
+      ]},
+      { category: "İntihar Riski Protokolü", items: [
+        "C-SSRS/ASQ akışı psikiyatrist danışmanla gözden geçirildi",
+        "Kriz güvenlik planı şablonu platforma entegre edildi",
+        "Yüksek risk durumunda klinisyene anlık bildirim protokolü test edildi",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "Tarama Modülü v1 (Doğrulanmış)",
-      "Triyaj Akış Diyagramı",
-      "Kriz Yönlendirme Protokolü",
-      "Risk Rozeti Tasarım Kılavuzu",
-    ],
+    outputs: ["Tarama Modülü v1 (Doğrulanmış)", "Triyaj Akış Diyagramı", "Kriz Yönlendirme Protokolü", "Risk Rozeti Tasarım Kılavuzu"],
   },
-
-  /* ─── AY 5 ─── */
   {
-    period: "Nisan 2026",
-    subtitle: "5. Dönem",
-    status: "planned",
-    phase: "Faz 2 — Çekirdek Geliştirme",
+    period: "Nisan 2026", subtitle: "5. Dönem", status: "planned", phase: "Faz 2 — Çekirdek Geliştirme",
     summary: "Kısa müdahale programlarının klinisyen onayından geçirilmesi ve uzman panelinin tasarımı",
     items: [
-      {
-        category: "Kısa Müdahale Programları",
-        items: [
-          "4 haftalık psikoeğitim programı (anksiyete): içerik + ödev + takip",
-          "4 haftalık depresyon farkındalık programı: içerik + ödev + takip",
-          "Programların klinik psikolog ve psikiyatrist onayından geçirilmesi",
-        ],
-      },
-      {
-        category: "Uzman Paneli",
-        items: [
-          "Klinisyen görünümü: danışan risk listesi, geçmiş tarama skorları",
-          "Danışanla güvenli mesajlaşma (asenkron) akışı",
-          "Seansa notlar ekleme ve takip planı oluşturma",
-        ],
-      },
-      {
-        category: "Gizlilik & Rıza",
-        items: [
-          "Kullanıcı veri rızası ekranları — anlaşılır dil testi yapıldı",
-          "Veri paylaşım tercihleri yönetim arayüzü",
-          "Kullanıcı verisi silme ve indirme hakkı akışı",
-        ],
-      },
+      { category: "Kısa Müdahale Programları", items: [
+        "4 haftalık psikoeğitim programı (anksiyete): içerik + ödev + takip",
+        "4 haftalık depresyon farkındalık programı: içerik + ödev + takip",
+        "Programların klinik psikolog ve psikiyatrist onayından geçirilmesi",
+      ]},
+      { category: "Uzman Paneli", items: [
+        "Klinisyen görünümü: danışan risk listesi, geçmiş tarama skorları",
+        "Danışanla güvenli mesajlaşma (asenkron) akışı",
+        "Seansa notlar ekleme ve takip planı oluşturma",
+      ]},
+      { category: "Gizlilik & Rıza", items: [
+        "Kullanıcı veri rızası ekranları — anlaşılır dil testi yapıldı",
+        "Veri paylaşım tercihleri yönetim arayüzü",
+        "Kullanıcı verisi silme ve indirme hakkı akışı",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "Kısa Müdahale Programları (Onaylı, 2 Modül)",
-      "Uzman Paneli Prototip",
-      "KVKK Rıza Ekranları",
-    ],
+    outputs: ["Kısa Müdahale Programları v1 (2 Modül)", "Uzman Paneli Prototip", "KVKK Rıza Ekranları"],
   },
-
-  /* ─── AY 6 ─── */
   {
-    period: "Mayıs 2026",
-    subtitle: "6. Dönem",
-    status: "planned",
-    phase: "Faz 2 — Çekirdek Geliştirme",
-    summary: "WebRTC görüntülü görüşme, kurumsal raporlama ve erişilebilirlik denetimi",
+    period: "Mayıs 2026", subtitle: "6. Dönem", status: "planned", phase: "Faz 2 — Çekirdek Geliştirme",
+    summary: "Görüntülü görüşme altyapısı, kurumsal raporlama ve erişilebilirlik denetimi",
     items: [
-      {
-        category: "Görüntülü Görüşme",
-        items: [
-          "Klinisyen–danışan görüntülü seans akışı ve kullanılabilirlik testi",
-          "Seans öncesi/sonrası otomatik PHQ-9 / GAD-7 hatırlatma",
-          "Oturum özeti ve klinisyen notu oluşturma şablonu",
-        ],
-      },
-      {
-        category: "Kurumsal Raporlama",
-        items: [
-          "Üniversite yöneticisi için risk dağılımı, tarama oranı, yönlendirme sayısı gösterge paneli",
-          "Klinik etkinlik izleme: puan değişimleri zaman serisi",
-          "Anonim aggregat raporlar (bireysel veri paylaşılmaksızın)",
-        ],
-      },
-      {
-        category: "Erişilebilirlik",
-        items: [
-          "WCAG 2.1 AA erişilebilirlik denetimi (görme/duyma engeli kullanıcıları)",
-          "Mobil ekran okuyucu uyumluluğu testi",
-          "Yalın Türkçe yazı standardı uygulandı (lise mezunu okuma düzeyi)",
-        ],
-      },
+      { category: "Görüntülü Görüşme", items: [
+        "Klinisyen–danışan görüntülü seans akışı ve kullanılabilirlik testi",
+        "Seans öncesi/sonrası otomatik PHQ-9 / GAD-7 hatırlatma",
+        "Oturum özeti ve klinisyen notu oluşturma şablonu",
+      ]},
+      { category: "Kurumsal Raporlama", items: [
+        "Üniversite yöneticisi için risk dağılımı ve yönlendirme sayısı gösterge paneli",
+        "Klinik etkinlik izleme: puan değişimleri zaman serisi",
+        "Anonim aggregat raporlar (bireysel veri paylaşılmaksızın)",
+      ]},
+      { category: "Erişilebilirlik", items: [
+        "WCAG 2.1 AA erişilebilirlik denetimi",
+        "Mobil ekran okuyucu uyumluluğu testi",
+        "Yalın Türkçe yazı standardı (lise mezunu okuma düzeyi)",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "Görüntülü Görüşme Modülü",
-      "Kurumsal Gösterge Paneli",
-      "WCAG 2.1 Uyum Raporu",
-    ],
+    outputs: ["Görüntülü Görüşme Modülü", "Kurumsal Gösterge Paneli", "WCAG 2.1 Uyum Raporu"],
   },
-
-  /* ─── AY 7 ─── */
   {
-    period: "Haziran 2026",
-    subtitle: "7. Dönem",
-    status: "planned",
-    phase: "Faz 2 — Çekirdek Geliştirme",
+    period: "Haziran 2026", subtitle: "7. Dönem", status: "planned", phase: "Faz 2 — Çekirdek Geliştirme",
     summary: "Güvenlik, KVKK tam uyum ve sınai mülkiyet başvuru hazırlıkları",
     items: [
-      {
-        category: "Güvenlik & Veri Güvencesi",
-        items: [
-          "Bağımsız güvenlik denetimi (penetrasyon testi) tamamlandı",
-          "Kişisel Sağlık Verisi Etki Değerlendirmesi (DPIA) tamamlandı",
-          "ISO 27001 / 27701 uyum boşluk analizi ve eylem planı",
-        ],
-      },
-      {
-        category: "IP Hazırlığı",
-        items: [
-          "Risk-triyaj motoru patent teknik açıklama belgesi tamamlandı",
-          "Kriz eskalasyon iş akışı patent belgesi tamamlandı",
-          "On-device gizlilik modülü patent belgesi tamamlandı",
-          "Ön patent araştırması (TR ve uluslararası) tamamlandı",
-        ],
-      },
-      {
-        category: "Ticari Marka",
-        items: [
-          '"AffectLog-TR" ticari marka Sınıf 9/42 başvurusu — TPE',
-          "Özgün GUI ekran düzenleri için tasarım tescili başvurusu",
-        ],
-      },
+      { category: "Güvenlik & Veri Güvencesi", items: [
+        "Bağımsız güvenlik denetimi (penetrasyon testi) tamamlandı",
+        "Kişisel Sağlık Verisi Etki Değerlendirmesi (DPIA) tamamlandı",
+        "ISO 27001 / 27701 uyum boşluk analizi ve eylem planı",
+      ]},
+      { category: "IP Hazırlığı", items: [
+        "Risk-triyaj motoru patent teknik açıklama belgesi tamamlandı",
+        "Kriz eskalasyon iş akışı patent belgesi tamamlandı",
+        "On-device gizlilik modülü patent belgesi tamamlandı",
+      ]},
+      { category: "Ticari Marka", items: [
+        '"AffectLog-TR" ticari marka Sınıf 9/42 başvurusu — TPE',
+        "Özgün GUI ekran düzenleri için tasarım tescili başvurusu",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "Güvenlik Denetim Raporu",
-      "DPIA Belgesi",
-      "3 Patent Teknik Belgesi",
-      "Ticari Marka Başvurusu",
-    ],
+    outputs: ["Güvenlik Denetim Raporu", "DPIA Belgesi", "3 Patent Teknik Belgesi", "Ticari Marka Başvurusu"],
   },
-
-  /* ─── AY 8 ─── */
   {
-    period: "Temmuz 2026",
-    subtitle: "8. Dönem",
-    status: "planned",
-    phase: "Faz 2 — Çekirdek Geliştirme",
+    period: "Temmuz 2026", subtitle: "8. Dönem", status: "planned", phase: "Faz 2 — Çekirdek Geliştirme",
     summary: "Sağlık bilgi sistemleri entegrasyonu ve USVS/SKRS uyumu",
     items: [
-      {
-        category: "Sağlık Sistemi Entegrasyonu",
-        items: [
-          "USVS (Ulusal Sağlık Veri Sözlüğü) alan eşlemesi tamamlandı",
-          "SKRS (Sağlık Kodlama Referans Sistemi) bağlantısı kuruldu",
-          "HL7 FHIR köprüsü ile elektronik hasta kaydı veri akışı test edildi",
-        ],
-      },
-      {
-        category: "Sevk & Yönlendirme Zinciri",
-        items: [
-          "e-MHRS (Merkezi Hekim Randevu Sistemi) entegrasyon fizibilitesi",
-          "Psikiyatri polikliniği sevk bildirim akışı tasarlandı",
-          "Kurum içi yönlendirme ve geri bildirim döngüsü tamamlandı",
-        ],
-      },
+      { category: "Sağlık Sistemi Entegrasyonu", items: [
+        "USVS alan eşlemesi tamamlandı",
+        "SKRS bağlantısı kuruldu",
+        "HL7 FHIR köprüsü ile elektronik hasta kaydı veri akışı test edildi",
+      ]},
+      { category: "Sevk & Yönlendirme Zinciri", items: [
+        "e-MHRS entegrasyon fizibilitesi tamamlandı",
+        "Psikiyatri polikliniği sevk bildirim akışı tasarlandı",
+        "Kurum içi yönlendirme ve geri bildirim döngüsü tamamlandı",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "USVS/SKRS Entegrasyon Belgesi",
-      "FHIR Mapping v1.0",
-      "Sevk Akış Protokolü",
-    ],
+    outputs: ["USVS/SKRS Entegrasyon Belgesi", "FHIR Mapping v1.0", "Sevk Akış Protokolü"],
   },
-
-  /* ─── AY 9 ─── */
   {
-    period: "Ağustos 2026",
-    subtitle: "9. Dönem",
-    status: "planned",
-    phase: "Faz 3 — MVP",
-    summary: "Platforma tüm modüllerin entegrasyonu, dahili alfa testi ve klinisyen eğitimi",
+    period: "Ağustos 2026", subtitle: "9. Dönem", status: "planned", phase: "Faz 3 — MVP",
+    summary: "Tüm modüllerin entegrasyonu, dahili alfa testi ve klinisyen eğitimi",
     items: [
-      {
-        category: "Alfa Testi",
-        items: [
-          "Proje ekibi ve danışman klinisyenlerle kapalı alfa testi (n=20)",
-          "Tarama → triyaj → yönlendirme tam senaryosu uçtan uca test",
-          "Kriz senaryosu simülasyonları ve protokol güvenliği doğrulama",
-        ],
-      },
-      {
-        category: "Klinisyen Eğitimi",
-        items: [
-          "Uzman paneli kullanım kılavuzu ve eğitim videoları hazırlandı",
-          "Klinisyen onboarding programı taslaklandı (2 saatlik çevrimiçi eğitim)",
-          "Kriz müdahale protokolü klinisyen simülasyonu tamamlandı",
-        ],
-      },
-      {
-        category: "Kullanılabilirlik",
-        items: [
-          "SUS (System Usability Scale) başlangıç ölçümü — hedef: ≥75",
-          "Alfa kullanıcıları ile derinlemesine görüşmeler",
-          "Öncelikli iyileştirme listesi oluşturuldu",
-        ],
-      },
+      { category: "Alfa Testi", items: [
+        "Proje ekibi ve danışman klinisyenlerle kapalı alfa testi (n=20)",
+        "Tarama → triyaj → yönlendirme tam senaryosu uçtan uca test",
+        "Kriz senaryosu simülasyonları ve protokol güvenliği doğrulama",
+      ]},
+      { category: "Klinisyen Eğitimi", items: [
+        "Uzman paneli kullanım kılavuzu ve eğitim videoları hazırlandı",
+        "Klinisyen onboarding programı (2 saatlik çevrimiçi eğitim)",
+        "Kriz müdahale protokolü klinisyen simülasyonu tamamlandı",
+      ]},
+      { category: "Kullanılabilirlik", items: [
+        "SUS (System Usability Scale) başlangıç ölçümü — hedef: ≥75",
+        "Alfa kullanıcıları ile derinlemesine görüşmeler",
+        "Öncelikli iyileştirme listesi oluşturuldu",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "MVP Alfa v1.0",
-      "Alfa Test Raporu",
-      "Klinisyen Eğitim Materyali",
-      "SUS Başlangıç Skoru",
-    ],
+    outputs: ["MVP Alfa v1.0", "Alfa Test Raporu", "Klinisyen Eğitim Materyali", "SUS Başlangıç Skoru"],
   },
-
-  /* ─── AY 10 ─── */
   {
-    period: "Eylül 2026",
-    subtitle: "10. Dönem",
-    status: "planned",
-    phase: "Faz 3 — MVP",
-    summary: "Geniş beta testi, ön-ölçüm verileri ve App Store/Play Store hazırlığı",
+    period: "Eylül 2026", subtitle: "10. Dönem", status: "planned", phase: "Faz 3 — MVP",
+    summary: "Geniş beta testi, ön-ölçüm verileri ve mağaza başvuruları",
     items: [
-      {
-        category: "Beta Testi",
-        items: [
-          "Dış beta (n≥50): üniversite öğrencileri + klinisyenler",
-          "T0 PHQ-9 / GAD-7 ön ölçüm verilerinin toplanması",
-          "Platforma katılım, tamamlama ve bırakma oranlarının analizi",
-        ],
-      },
-      {
-        category: "İçerik Kalitesi",
-        items: [
-          "Kısa müdahale içeriklerine yönelik kullanıcı geri bildirim analizi",
-          "Psikoeğitim modüllerinde güncelleme ve basitleştirme",
-          "Anonim beta kullanıcı memnuniyet anketi",
-        ],
-      },
-      {
-        category: "Yayın Hazırlığı",
-        items: [
-          "Apple App Store sağlık uygulaması inceleme başvurusu",
-          "Google Play Store başvurusu",
-          "Web uygulaması erişilebilirlik ve tarayıcı uyumluluk testi",
-        ],
-      },
+      { category: "Beta Testi", items: [
+        "Dış beta (n≥50): üniversite öğrencileri + klinisyenler",
+        "T0 PHQ-9 / GAD-7 ön ölçüm verilerinin toplanması",
+        "Platforma katılım, tamamlama ve bırakma oranlarının analizi",
+      ]},
+      { category: "İçerik Kalitesi", items: [
+        "Kısa müdahale içeriklerine yönelik kullanıcı geri bildirim analizi",
+        "Psikoeğitim modüllerinde güncelleme ve basitleştirme",
+        "Anonim beta kullanıcı memnuniyet anketi",
+      ]},
+      { category: "Yayın Hazırlığı", items: [
+        "Apple App Store sağlık uygulaması inceleme başvurusu",
+        "Google Play Store başvurusu",
+        "Web uygulaması tarayıcı uyumluluk testi",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "MVP Beta v1.1",
-      "T0 Ön-Ölçüm Veri Seti",
-      "Beta Kullanıcı Geri Bildirim Raporu",
-      "App Store Başvuruları",
-    ],
+    outputs: ["MVP Beta v1.1", "T0 Ön-Ölçüm Veri Seti", "Beta Geri Bildirim Raporu", "App Store Başvuruları"],
   },
-
-  /* ─── AY 11 ─── */
   {
-    period: "Ekim 2026",
-    subtitle: "11. Dönem",
-    status: "planned",
-    phase: "Faz 3 — MVP",
+    period: "Ekim 2026", subtitle: "11. Dönem", status: "planned", phase: "Faz 3 — MVP",
     summary: "MVP nihai sürümü, klinik güvenlik son denetimi ve pilot protokolü onayı",
     items: [
-      {
-        category: "Klinik Güvenlik Denetimi",
-        items: [
-          "Bağımsız klinisyen paneli ile kriz yönlendirme protokolü son denetimi",
-          "Klinik içeriklerin psikiyatrist ve klinik psikolog ortak onayı",
-          "Güvenlik senaryoları simülasyon raporu hazırlandı",
-        ],
-      },
-      {
-        category: "Pilot Hazırlığı",
-        items: [
-          "2+ üniversite ile pilot katılım anlaşması imzalandı",
-          "Klinisyen eğitim seminerleri pilot kurumlarda yapıldı",
-          "Katılımcı kayıt ve tarama süreçleri test edildi",
-        ],
-      },
-      {
-        category: "Ölçüm Araçları",
-        items: [
-          "Etki ölçüm planı: ΔPHQ-9 / ΔGAD-7 / SUS protokolü onaylandı",
-          "Veri toplama ve analiz metodolojisi dokümante edildi",
-        ],
-      },
+      { category: "Klinik Güvenlik Denetimi", items: [
+        "Bağımsız klinisyen paneli ile kriz yönlendirme protokolü son denetimi",
+        "Klinik içeriklerin psikiyatrist ve klinik psikolog ortak onayı",
+        "Güvenlik senaryoları simülasyon raporu hazırlandı",
+      ]},
+      { category: "Pilot Hazırlığı", items: [
+        "2+ üniversite ile pilot katılım anlaşması imzalandı",
+        "Klinisyen eğitim seminerleri pilot kurumlarda yapıldı",
+        "Katılımcı kayıt ve tarama süreçleri test edildi",
+      ]},
+      { category: "Ölçüm Araçları", items: [
+        "Etki ölçüm planı: ΔPHQ-9 / ΔGAD-7 / SUS protokolü onaylandı",
+        "Veri toplama ve analiz metodolojisi dokümante edildi",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "MVP v1.2 (Production)",
-      "Klinik Güvenlik Onay Belgesi",
-      "Pilot Katılım Anlaşmaları",
-      "Etki Ölçüm Protokolü",
-    ],
+    outputs: ["MVP v1.2 (Production)", "Klinik Güvenlik Onay Belgesi", "Pilot Katılım Anlaşmaları", "Etki Ölçüm Protokolü"],
   },
-
-  /* ─── AY 12 ─── */
   {
-    period: "Kasım 2026",
-    subtitle: "12. Dönem",
-    status: "planned",
-    phase: "Faz 4 — Pilot",
+    period: "Kasım 2026", subtitle: "12. Dönem", status: "planned", phase: "Faz 4 — Pilot",
     summary: "Çok merkezli pilot lansmanı — tarama, triyaj ve yönlendirme zinciri canlıya alındı",
     items: [
-      {
-        category: "Pilot Lansmanı",
-        items: [
-          "En az 2 üniversitede platforma erişim açıldı",
-          "Katılımcı kayıt kampanyası başlatıldı (hedef: ≥200 öğrenci)",
-          "Klinisyen koordinatörlere platform erişimi ve canlı destek sağlandı",
-        ],
-      },
-      {
-        category: "Tarama & Triyaj (Canlı)",
-        items: [
-          "İlk hafta: T0 PHQ-9 / GAD-7 / C-SSRS değerlendirmeleri",
-          "Otomatik triyaj ve yönlendirme akışı — ilk vaka takibi başladı",
-          "Yüksek risk vakalarında klinisyen müdahale süresi izlendi",
-        ],
-      },
-      {
-        category: "Pilot İzleme",
-        items: [
-          "Haftalık katılım ve tamamlama oranı raporu",
-          "Klinisyen panel kullanım yoğunluğu analizi",
-          "7/24 teknik ve klinik destek hattı aktive edildi",
-        ],
-      },
+      { category: "Pilot Lansmanı", items: [
+        "En az 2 üniversitede platforma erişim açıldı",
+        "Katılımcı kayıt kampanyası başlatıldı (hedef: ≥200 öğrenci)",
+        "Klinisyen koordinatörlere platform erişimi ve canlı destek sağlandı",
+      ]},
+      { category: "Tarama & Triyaj (Canlı)", items: [
+        "İlk hafta: T0 PHQ-9 / GAD-7 / C-SSRS değerlendirmeleri",
+        "Otomatik triyaj ve yönlendirme akışı — ilk vaka takibi başladı",
+        "Yüksek risk vakalarında klinisyen müdahale süresi izlendi",
+      ]},
+      { category: "Pilot İzleme", items: [
+        "Haftalık katılım ve tamamlama oranı raporu",
+        "Klinisyen panel kullanım yoğunluğu analizi",
+        "7/24 teknik ve klinik destek hattı aktive edildi",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "Pilot Kayıt Raporu (Hafta 1)",
-      "T0 Çok Merkezli Ölçüm Verileri",
-      "Pilot İzleme Gösterge Paneli",
-    ],
+    outputs: ["Pilot Kayıt Raporu (Hafta 1)", "T0 Çok Merkezli Ölçüm Verileri", "Pilot İzleme Paneli"],
   },
-
-  /* ─── AY 13 ─── */
   {
-    period: "Aralık 2026",
-    subtitle: "13. Dönem",
-    status: "planned",
-    phase: "Faz 4 — Pilot",
+    period: "Aralık 2026", subtitle: "13. Dönem", status: "planned", phase: "Faz 4 — Pilot",
     summary: "Pilot orta dönem: müdahale takibi, klinisyen geri bildirimi ve içerik iyileştirme",
     items: [
-      {
-        category: "Ara Ölçüm",
-        items: [
-          "T1 (6. hafta) PHQ-9 / GAD-7 ara değerlendirmeleri",
-          "Kısa müdahale programını tamamlayanlar için ΔPHQ-9 / ΔGAD-7 ara analizi",
-          "Katılım ısı haritası: hangi içeriklerin en çok tamamlandığı",
-        ],
-      },
-      {
-        category: "Klinisyen Deneyimi",
-        items: [
-          "Pilot klinisyen geri bildirim odak grubu (n=10)",
-          "Uzman panelinde eksik özellik ve iş akışı sorunlarının tespiti",
-          "Klinisyen iş yükü ve zaman kazanımı analizi",
-        ],
-      },
-      {
-        category: "İçerik İyileştirme",
-        items: [
-          "En az tamamlanan müdahale modüllerinde revizyon",
-          "Kullanıcı anlık geri bildirim (emoji derecelendirme) verisinin analizi",
-        ],
-      },
+      { category: "Ara Ölçüm", items: [
+        "T1 (6. hafta) PHQ-9 / GAD-7 ara değerlendirmeleri",
+        "Kısa müdahale programını tamamlayanlar için ΔPHQ-9 / ΔGAD-7 ara analizi",
+        "Katılım ısı haritası: hangi içeriklerin en çok tamamlandığı",
+      ]},
+      { category: "Klinisyen Deneyimi", items: [
+        "Pilot klinisyen geri bildirim odak grubu (n=10)",
+        "Uzman panelinde eksik özellik ve iş akışı sorunlarının tespiti",
+        "Klinisyen iş yükü ve zaman kazanımı analizi",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "T1 Ara Ölçüm Raporu",
-      "Klinisyen Deneyim Raporu",
-      "İçerik Revizyon Günlüğü",
-    ],
+    outputs: ["T1 Ara Ölçüm Raporu", "Klinisyen Deneyim Raporu", "İçerik Revizyon Günlüğü"],
   },
-
-  /* ─── AY 14 ─── */
   {
-    period: "Ocak 2027",
-    subtitle: "14. Dönem",
-    status: "planned",
-    phase: "Faz 4 — Pilot",
+    period: "Ocak 2027", subtitle: "14. Dönem", status: "planned", phase: "Faz 4 — Pilot",
     summary: "Pilot tamamlama, etki analizi ve akademik yayın hazırlığı",
     items: [
-      {
-        category: "Etki Ölçümü",
-        items: [
-          "T2 (12. hafta) son PHQ-9 / GAD-7 / SUS ölçümleri tamamlandı",
-          "ΔPHQ-9 ve ΔGAD-7 istatistiksel analizi (paired t-test, Cohen's d)",
-          "Yönlendirme etkinliği: yüksek risk vakalarında klinik müdahale oranı",
-        ],
-      },
-      {
-        category: "Akademik & Raporlama",
-        items: [
-          "Çok merkezli pilot araştırma raporu yazıldı",
-          "Hakemli dergi için makale taslağı hazırlandı (hedef: Türk Psikiyatri Dergisi)",
-          "TÜBİTAK ara raporu teslim edildi",
-        ],
-      },
-      {
-        category: "Öğrenilen Dersler",
-        items: [
-          "Pilot bulguları ışığında triyaj motoru kalibrasyonu",
-          "Klinik içerik etkinliği değerlendirmesi ve revizyon kararı",
-        ],
-      },
+      { category: "Etki Ölçümü", items: [
+        "T2 (12. hafta) son PHQ-9 / GAD-7 / SUS ölçümleri tamamlandı",
+        "ΔPHQ-9 ve ΔGAD-7 istatistiksel analizi (paired t-test, Cohen's d)",
+        "Yönlendirme etkinliği: yüksek risk vakalarında klinik müdahale oranı",
+      ]},
+      { category: "Akademik & Raporlama", items: [
+        "Çok merkezli pilot araştırma raporu yazıldı",
+        "Hakemli dergi için makale taslağı hazırlandı",
+        "TÜBİTAK ara raporu teslim edildi",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "Pilot Etki Analiz Raporu",
-      "Akademik Makale Taslağı",
-      "TÜBİTAK Ara Raporu",
-      "Triyaj Kalibrasyon Raporu",
-    ],
+    outputs: ["Pilot Etki Analiz Raporu", "Akademik Makale Taslağı", "TÜBİTAK Ara Raporu", "Triyaj Kalibrasyon Raporu"],
   },
-
-  /* ─── AY 15 ─── */
   {
-    period: "Şubat 2027",
-    subtitle: "15. Dönem",
-    status: "planned",
-    phase: "Faz 5 — Kurumsal Entegrasyon",
-    summary: "Pilot bulgularının ticari sürüme aktarılması ve ilk kurumsal müşteri görüşmeleri",
+    period: "Şubat 2027", subtitle: "15. Dönem", status: "planned", phase: "Faz 5 — Kurumsal Entegrasyon",
+    summary: "Pilot bulgularının ticari sürüme aktarılması ve kurumsal müşteri görüşmeleri",
     items: [
-      {
-        category: "Pilot → Ürün",
-        items: [
-          "Pilot bulgularına dayalı platform v2.0 geliştirme öncelikleri belirlendi",
-          "Klinik içerik kütüphanesi pilot verileriyle güncellendi",
-          "SUS skoru hedef: ≥80 (pilot ≥75 ise ilerleme)",
-        ],
-      },
-      {
-        category: "Kurumsal Satış Hazırlığı",
-        items: [
-          "ROI hesaplama aracı: kurum başına maliyet-etkinlik analizi",
-          "Vaka çalışmaları ve pilot sonuç özetleri (kurumsal sunum materyali)",
-          "B2B SaaS fiyat modeli: kurum lisansı + kullanıcı başı seçenekleri",
-        ],
-      },
-      {
-        category: "Marka & İletişim",
-        items: [
-          "Ürün web sitesi güncellendi (pilot kanıt ile)",
-          "Sektör konferansı (üniversite psikolojik danışmanlık) sunum başvurusu",
-        ],
-      },
+      { category: "Pilot → Ürün", items: [
+        "Pilot bulgularına dayalı platform v2.0 öncelikleri belirlendi",
+        "Klinik içerik kütüphanesi pilot verileriyle güncellendi",
+        "SUS skoru hedef: ≥80",
+      ]},
+      { category: "Kurumsal Satış Hazırlığı", items: [
+        "ROI hesaplama aracı: kurum başına maliyet-etkinlik analizi",
+        "Vaka çalışmaları ve pilot sonuç özetleri",
+        "B2B SaaS fiyat modeli: kurum lisansı + kullanıcı başı seçenekleri",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "Platform v2.0 Öncelik Listesi",
-      "ROI Hesaplama Aracı",
-      "Kurumsal Sunum Paketi",
-      "Güncellenmiş Ürün Web Sitesi",
-    ],
+    outputs: ["Platform v2.0 Öncelik Listesi", "ROI Hesaplama Aracı", "Kurumsal Sunum Paketi"],
   },
-
-  /* ─── AY 16 ─── */
   {
-    period: "Mart 2027",
-    subtitle: "16. Dönem",
-    status: "planned",
-    phase: "Faz 5 — Kurumsal Entegrasyon",
-    summary: "Sağlık Bakanlığı / YÖK entegrasyon görüşmeleri ve ölçeklenebilir barındırma",
+    period: "Mart 2027", subtitle: "16. Dönem", status: "planned", phase: "Faz 5 — Kurumsal Entegrasyon",
+    summary: "Sağlık Bakanlığı / YÖK görüşmeleri ve ölçeklenebilir barındırma",
     items: [
-      {
-        category: "Kamu Kurumu İlişkileri",
-        items: [
-          "Sağlık Bakanlığı dijital sağlık birimi tanıtım görüşmesi",
-          "YÖK öğrenci psikolojik destek politikası çalışma grubuna katılım",
-          "USVS/SKRS canlı entegrasyon onay sürecinin başlatılması",
-        ],
-      },
-      {
-        category: "Ölçeklenme",
-        items: [
-          "Türkiye veri merkezlerinde yüksek erişilebilirlik altyapısı",
-          "Eş zamanlı 10.000+ kullanıcı yük testleri",
-          "Felaket kurtarma ve iş sürekliliği planı",
-        ],
-      },
-      {
-        category: "ISO 27001 Belgelendirme",
-        items: [
-          "ISO 27001 / 27701 denetim başvurusu tamamlandı",
-          "Sertifikasyon hedefi: Q2 2027",
-        ],
-      },
+      { category: "Kamu Kurumu İlişkileri", items: [
+        "Sağlık Bakanlığı dijital sağlık birimi tanıtım görüşmesi",
+        "YÖK öğrenci psikolojik destek politikası çalışma grubuna katılım",
+        "USVS/SKRS canlı entegrasyon onay süreci başlatıldı",
+      ]},
+      { category: "ISO 27001 Belgelendirme", items: [
+        "ISO 27001 / 27701 denetim başvurusu tamamlandı",
+        "İç denetim ve düzeltici faaliyetler",
+        "Sertifikasyon hedefi: Q2 2027",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "Kamu Kurumu Toplantı Tutanakları",
-      "Yük Testi Raporu",
-      "ISO 27001 Başvurusu",
-    ],
+    outputs: ["Kamu Kurumu Toplantı Tutanakları", "ISO 27001 Başvurusu"],
   },
-
-  /* ─── AY 17 ─── */
   {
-    period: "Nisan 2027",
-    subtitle: "17. Dönem",
-    status: "planned",
-    phase: "Faz 5 — Kurumsal Entegrasyon",
+    period: "Nisan 2027", subtitle: "17. Dönem", status: "planned", phase: "Faz 5 — Kurumsal Entegrasyon",
     summary: "Patent başvuruları ve sınai mülkiyet portföyünün tamamlanması",
     items: [
-      {
-        category: "Patent Başvuruları",
-        items: [
-          "Patent 1 — Risk-Triyaj Motoru: TPE başvurusu teslim edildi",
-          "Patent 2 — On-device Gizlilik Modülü: TPE başvurusu teslim edildi",
-          "Patent 3 — Kriz Eskalasyon İş Akışı: TPE başvurusu teslim edildi",
-        ],
-      },
-      {
-        category: "Uluslararası IP",
-        items: [
-          "PCT (Patent İşbirliği Antlaşması) başvurusu fizibilite değerlendirmesi",
-          "AB ve MENA bölgesi için patent strateji raporu",
-          "Açık kaynak politikası yayınlandı",
-        ],
-      },
+      { category: "Patent Başvuruları", items: [
+        "Patent 1 — Risk-Triyaj Motoru: TPE başvurusu teslim edildi",
+        "Patent 2 — On-device Gizlilik Modülü: TPE başvurusu teslim edildi",
+        "Patent 3 — Kriz Eskalasyon İş Akışı: TPE başvurusu teslim edildi",
+      ]},
+      { category: "Uluslararası IP", items: [
+        "PCT başvurusu fizibilite değerlendirmesi",
+        "AB ve MENA bölgesi için patent strateji raporu",
+        "Açık kaynak politikası yayınlandı",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "3 Patent Başvurusu (TPE)",
-      "PCT Strateji Raporu",
-      "IP Portföy Envanteri",
-    ],
+    outputs: ["3 Patent Başvurusu (TPE)", "PCT Strateji Raporu", "IP Portföy Envanteri"],
   },
-
-  /* ─── AY 18 ─── */
   {
-    period: "Mayıs 2027",
-    subtitle: "18. Dönem",
-    status: "planned",
-    phase: "Faz 5 — Kurumsal Entegrasyon",
+    period: "Mayıs 2027", subtitle: "18. Dönem", status: "planned", phase: "Faz 5 — Kurumsal Entegrasyon",
     summary: "İlk ticari kurumsal satışlar ve ISO 27001 sertifikasyonu",
     items: [
-      {
-        category: "Ticari Lansmanı",
-        items: [
-          "İlk 5 üniversite ile B2B SaaS sözleşmesi hedefi",
-          "On-premise dağıtım paketi ilk kurumsal müşteriye teslim",
-          "Müşteri başarı ve teknik destek süreçleri standartlaştırıldı",
-        ],
-      },
-      {
-        category: "ISO 27001",
-        items: [
-          "ISO 27001 / 27701 sertifikasyonu alındı",
-          "Sertifika kurumsal satış sürecinde güven belgesi olarak kullanıldı",
-        ],
-      },
-      {
-        category: "Akademik Etki",
-        items: [
-          "Hakemli dergide makale yayımlandı / kabul alındı",
-          "Ulusal psikiyatri/psikoloji kongresinde poster/sunum",
-        ],
-      },
+      { category: "Ticari Lansman", items: [
+        "İlk 5 üniversite ile B2B SaaS sözleşmesi hedefi",
+        "On-premise dağıtım paketi ilk kurumsal müşteriye teslim",
+        "Müşteri başarı ve teknik destek süreçleri standartlaştırıldı",
+      ]},
+      { category: "Akademik Etki", items: [
+        "Hakemli dergide makale yayımlandı / kabul alındı",
+        "Ulusal psikiyatri kongresinde poster/sunum yapıldı",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "İlk Ticari Sözleşmeler (≥3)",
-      "ISO 27001 Sertifikası",
-      "Yayımlanan Akademik Makale",
-    ],
+    outputs: ["İlk Ticari Sözleşmeler (≥3)", "ISO 27001 Sertifikası", "Yayımlanan Akademik Makale"],
   },
-
-  /* ─── AY 19 ─── */
   {
-    period: "Haziran 2027",
-    subtitle: "19. Dönem",
-    status: "planned",
-    phase: "Faz 6 — İhracat & Ölçek",
+    period: "Haziran 2027", subtitle: "19. Dönem", status: "planned", phase: "Faz 6 — İhracat & Ölçek",
     summary: "Uluslararası yerelleştirme ve kültürel klinik uyarlama",
     items: [
-      {
-        category: "Çok Dilli İçerik",
-        items: [
-          "İngilizce (EN): tüm klinik içerik ve arayüz çevirisi tamamlandı",
-          "Arapça (AR): sağdan sola (RTL) arayüz ve kültürel uyarlama",
-          "Almanca (DE): AB veri mevzuatına uygun sürüm",
-        ],
-      },
-      {
-        category: "Kültürel Uyarlama",
-        items: [
-          "PHQ-9 / GAD-7 yerel norm ve eşik değerleri: ülke bazlı kalibrasyon",
-          "Kriz yönlendirme kaynakları: ülke bazlı acil hatlar ve kurumlar",
-          "Kültürel duyarlılık danışman incelemesi (3 bölge)",
-        ],
-      },
+      { category: "Çok Dilli İçerik", items: [
+        "İngilizce (EN): tüm klinik içerik ve arayüz çevirisi tamamlandı",
+        "Arapça (AR): sağdan sola (RTL) arayüz ve kültürel uyarlama",
+        "Almanca (DE): AB veri mevzuatına uygun sürüm",
+      ]},
+      { category: "Kültürel Uyarlama", items: [
+        "PHQ-9 / GAD-7 yerel norm ve eşik değerleri ülke bazlı kalibre edildi",
+        "Kriz yönlendirme kaynakları ülke bazlı güncellendi",
+        "Kültürel duyarlılık danışman incelemesi (3 bölge)",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "Çok Dilli Platform (EN/AR/DE)",
-      "Ülke Bazlı Kriz Kaynak Rehberi",
-      "Kültürel Uyarlama Raporu",
-    ],
+    outputs: ["Çok Dilli Platform (EN/AR/DE)", "Ülke Bazlı Kriz Kaynak Rehberi", "Kültürel Uyarlama Raporu"],
   },
-
-  /* ─── AY 20 ─── */
   {
-    period: "Temmuz 2027",
-    subtitle: "20. Dönem",
-    status: "planned",
-    phase: "Faz 6 — İhracat & Ölçek",
+    period: "Temmuz 2027", subtitle: "20. Dönem", status: "planned", phase: "Faz 6 — İhracat & Ölçek",
     summary: "MENA ve Türkî Cumhuriyetler pazar girişi hazırlığı",
     items: [
-      {
-        category: "Pazar Araştırması",
-        items: [
-          "MENA ülkeleri: ruh sağlığı hizmet boşluğu ve ödeme gücü analizi",
-          "Türkî Cumhuriyetler: dil yakınlığı ve sağlık sistemi haritası",
-          "AB üniversite sağlık merkezleri: GDPR uyum ve pilot fırsat araştırması",
-        ],
-      },
-      {
-        category: "Ortaklık Geliştirme",
-        items: [
-          "Hedef bölgelerde yerel dağıtım / uygulama ortağı görüşmeleri",
-          "Uluslararası üniversite işbirliği protokolleri",
-          "Ülkede barındırma (country hosting) mimarisi ve hukuki çerçeve",
-        ],
-      },
+      { category: "Pazar Araştırması", items: [
+        "MENA ülkeleri: ruh sağlığı hizmet boşluğu ve ödeme gücü analizi",
+        "Türkî Cumhuriyetler: dil yakınlığı ve sağlık sistemi haritası",
+        "AB üniversite sağlık merkezleri: GDPR uyum ve pilot fırsat araştırması",
+      ]},
+      { category: "Ortaklık Geliştirme", items: [
+        "Hedef bölgelerde yerel dağıtım / uygulama ortağı görüşmeleri",
+        "Uluslararası üniversite işbirliği protokolleri",
+        "Ülkede barındırma mimarisi ve hukuki çerçeve",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "Pazar Giriş Stratejisi (3 Bölge)",
-      "Ortaklık Mutabakat Mektupları",
-      "Uluslararası Hukuki Çerçeve Raporu",
-    ],
+    outputs: ["Pazar Giriş Stratejisi (3 Bölge)", "Ortaklık Mutabakat Mektupları"],
   },
-
-  /* ─── AY 21 ─── */
   {
-    period: "Ağustos 2027",
-    subtitle: "21. Dönem",
-    status: "planned",
-    phase: "Faz 6 — İhracat & Ölçek",
-    summary: "SaMD (Tıbbi Cihaz Yazılımı) yükseltme değerlendirmesi ve ikinci pilot hazırlığı",
+    period: "Ağustos 2027", subtitle: "21. Dönem", status: "planned", phase: "Faz 6 — İhracat & Ölçek",
+    summary: "SaMD yükseltme değerlendirmesi ve ikinci uluslararası pilot hazırlığı",
     items: [
-      {
-        category: "SaMD Değerlendirmesi",
-        items: [
-          "IEC 62304 / ISO 13485 / ISO 14971 boşluk analizi tamamlandı",
-          "Risk sınıflandırması: platform hangi SaMD sınıfına giriyor?",
-          "Düzenleyici danışman ile go/no-go kararı",
-        ],
-      },
-      {
-        category: "Uluslararası Pilot",
-        items: [
-          "En az 1 uluslararası üniversite ile pilot anlaşması imzalandı",
-          "Çok dilli veri toplama ve etki ölçüm protokolü hazırlandı",
-        ],
-      },
+      { category: "SaMD Değerlendirmesi", items: [
+        "IEC 62304 / ISO 13485 / ISO 14971 boşluk analizi tamamlandı",
+        "Risk sınıflandırması ve SaMD go/no-go kararı",
+        "Düzenleyici danışman ile strateji oturumu yapıldı",
+      ]},
+      { category: "Uluslararası Pilot", items: [
+        "En az 1 uluslararası üniversite ile pilot anlaşması imzalandı",
+        "Çok dilli veri toplama ve etki ölçüm protokolü hazırlandı",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "SaMD Boşluk Analizi",
-      "Düzenleyici Strateji Belgesi",
-      "Uluslararası Pilot Anlaşması",
-    ],
+    outputs: ["SaMD Boşluk Analizi", "Düzenleyici Strateji Belgesi", "Uluslararası Pilot Anlaşması"],
   },
-
-  /* ─── AY 22 ─── */
   {
-    period: "Eylül 2027",
-    subtitle: "22. Dönem",
-    status: "planned",
-    phase: "Faz 6 — İhracat & Ölçek",
-    summary: "Uluslararası pilot canlı, platform v2.0 ve ML destekli triyaj modeli",
+    period: "Eylül 2027", subtitle: "22. Dönem", status: "planned", phase: "Faz 6 — İhracat & Ölçek",
+    summary: "Uluslararası pilot canlı ve platform v2.0",
     items: [
-      {
-        category: "Uluslararası Pilot (Canlı)",
-        items: [
-          "Uluslararası pilot başlatıldı — çok dilli tarama ve triyaj aktif",
-          "T0 uluslararası ön-ölçüm verileri toplandı",
-          "Bölgeler arası veri karşılaştırma protokolü",
-        ],
-      },
-      {
-        category: "Platform v2.0",
-        items: [
-          "Triyaj motoru v2: pilot verileriyle kalibrasyon",
-          "Esnek anket kütüphanesi: yeni ölçekler eklenebilir yapı",
-          "İşveren sağlık programı modülü (kurumsal B2B yeni segment)",
-        ],
-      },
+      { category: "Uluslararası Pilot (Canlı)", items: [
+        "Uluslararası pilot başlatıldı — çok dilli tarama ve triyaj aktif",
+        "T0 uluslararası ön-ölçüm verileri toplandı",
+        "Bölgeler arası veri karşılaştırma protokolü uygulandı",
+      ]},
+      { category: "Platform v2.0", items: [
+        "Triyaj motoru v2: pilot verileriyle kalibrasyon",
+        "Esnek anket kütüphanesi: yeni ölçekler eklenebilir yapı",
+        "İşveren sağlık programı modülü beta",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "Platform v2.0",
-      "Uluslararası T0 Veri Seti",
-      "İşveren Modülü Beta",
-    ],
+    outputs: ["Platform v2.0", "Uluslararası T0 Veri Seti", "İşveren Modülü Beta"],
   },
-
-  /* ─── AY 23 ─── */
   {
-    period: "Ekim 2027",
-    subtitle: "23. Dönem",
-    status: "planned",
-    phase: "Faz 6 — İhracat & Ölçek",
+    period: "Ekim 2027", subtitle: "23. Dönem", status: "planned", phase: "Faz 6 — İhracat & Ölçek",
     summary: "Uluslararası pazar lansmanı ve kurumsal müşteri tabanının genişletilmesi",
     items: [
-      {
-        category: "Uluslararası Lansman",
-        items: [
-          "İlk uluslararası kurumsal sözleşme hedefi (MENA veya Türkî Cumhuriyetler)",
-          "Uluslararası psikiyatri / ruh sağlığı konferansında platform tanıtımı",
-          "Çok dilli müşteri destek ve onboarding süreçleri aktif",
-        ],
-      },
-      {
-        category: "Etki Büyümesi",
-        items: [
-          "Türkiye'de toplam erişim: ≥1000 aktif kullanıcı hedefi",
-          "Toplam tamamlanan tarama sayısı ve yönlendirme oranı raporlama",
-          "Sosyal etki raporu hazırlandı (yatırımcı, fon kuruluşları için)",
-        ],
-      },
+      { category: "Uluslararası Lansman", items: [
+        "İlk uluslararası kurumsal sözleşme (MENA veya Türkî Cumhuriyetler)",
+        "Uluslararası psikiyatri konferansında platform tanıtımı",
+        "Çok dilli müşteri destek ve onboarding aktif",
+      ]},
+      { category: "Etki Büyümesi", items: [
+        "Türkiye'de toplam erişim: ≥1000 aktif kullanıcı hedefi",
+        "Toplam tamamlanan tarama sayısı ve yönlendirme oranı raporlama",
+        "Sosyal etki raporu hazırlandı",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "Uluslararası İlk Sözleşme",
-      "Sosyal Etki Raporu",
-      "Platform Erişim Büyüme Raporu",
-    ],
+    outputs: ["Uluslararası İlk Sözleşme", "Sosyal Etki Raporu", "Platform Erişim Büyüme Raporu"],
   },
-
-  /* ─── AY 24 ─── */
   {
-    period: "Kasım 2027",
-    subtitle: "24. Dönem",
-    status: "planned",
-    phase: "Faz 6 — İhracat & Ölçek",
+    period: "Kasım 2027", subtitle: "24. Dönem", status: "planned", phase: "Faz 6 — İhracat & Ölçek",
     summary: "Proje kapanışı, TÜBİTAK final raporu ve sürdürülebilir büyüme planı",
     items: [
-      {
-        category: "Proje Kapanışı",
-        items: [
-          "TÜBİTAK final raporu: hedef gerçekleşme, harcama ve çıktı özeti",
-          "Etki özeti: toplam tarama, yönlendirme, ΔPHQ-9 / ΔGAD-7 ortalaması",
-          "Proje IP portföyü (3 patent, marka, tasarım tescili) tamamlandı",
-        ],
-      },
-      {
-        category: "Sürdürülebilirlik",
-        items: [
-          "Post-proje ürün yol haritası 2028–2030 onaylandı",
-          "Uluslararası iş ortaklığı mutabakat tutanakları imzalandı",
-          "Yatırım/hibe başvuru paketi (Seri A veya AB Ufuk Avrupa) hazırlandı",
-        ],
-      },
-      {
-        category: "Toplumsal Etki",
-        items: [
-          "24 ayda ulaşılan kullanıcı, kurum ve ülke sayısı raporlandı",
-          "Platforma erişemeyen risk grupları için sonraki adım önerileri",
-          "Üniversite ruh sağlığı politikası katkı belgesi hazırlandı",
-        ],
-      },
+      { category: "Proje Kapanışı", items: [
+        "TÜBİTAK final raporu: hedef gerçekleşme, harcama ve çıktı özeti",
+        "Etki özeti: toplam tarama, yönlendirme, ΔPHQ-9 / ΔGAD-7 ortalaması",
+        "Proje IP portföyü tamamlandı ve arşivlendi",
+      ]},
+      { category: "Sürdürülebilirlik", items: [
+        "Post-proje ürün yol haritası 2028–2030 onaylandı",
+        "Yatırım/hibe başvuru paketi (Seri A veya AB Ufuk Avrupa) hazırlandı",
+        "Üniversite ruh sağlığı politikası katkı belgesi hazırlandı",
+      ]},
+      { category: "Toplumsal Etki", items: [
+        "24 ayda ulaşılan kullanıcı, kurum ve ülke sayısı raporlandı",
+        "Platforma erişemeyen risk grupları için sonraki adım önerileri",
+      ]},
     ],
     pending: [],
-    outputs: [
-      "TÜBİTAK Final Raporu",
-      "Sosyal Etki Özet Belgesi",
-      "2028–2030 Yol Haritası",
-      "Yatırım Başvuru Paketi",
-      "IP Portföyü (Tam)",
-    ],
+    outputs: ["TÜBİTAK Final Raporu", "Sosyal Etki Belgesi", "2028–2030 Yol Haritası", "Yatırım Paketi", "IP Portföyü (Tam)"],
   },
 ];
 
-const phaseColors: Record<string, string> = {
-  "Faz 1 — Temel":    "bg-purple-100 text-purple-700",
-  "Faz 2 — Çekirdek Geliştirme":  "bg-blue-100 text-blue-700",
-  "Faz 3 — MVP":           "bg-cyan-100 text-cyan-700",
-  "Faz 4 — Pilot":        "bg-green-100 text-green-700",
-  "Faz 5 — Kurumsal Entegrasyon":      "bg-orange-100 text-orange-700",
-  "Faz 6 — İhracat & Ölçek":      "bg-rose-100 text-rose-700",
-};
-
-const phaseRanges: Record<string, string> = {
-  "Faz 1 — Temel":                "Ara 2025 – Şub 2026",
-  "Faz 2 — Çekirdek Geliştirme":  "Mar 2026 – Tem 2026",
-  "Faz 3 — MVP":                  "Ağu 2026 – Eki 2026",
-  "Faz 4 — Pilot":                "Kas 2026 – Oca 2027",
-  "Faz 5 — Kurumsal Entegrasyon": "Şub 2027 – May 2027",
-  "Faz 6 — İhracat & Ölçek":      "Haz 2027 – Kas 2027",
-};
-
-const phaseNodeColors: Record<string, string> = {
-  "Faz 1 — Temel":                "bg-purple-500 border-purple-500",
-  "Faz 2 — Çekirdek Geliştirme":  "bg-blue-500 border-blue-500",
-  "Faz 3 — MVP":                  "bg-cyan-500 border-cyan-500",
-  "Faz 4 — Pilot":                "bg-green-500 border-green-500",
-  "Faz 5 — Kurumsal Entegrasyon": "bg-orange-500 border-orange-500",
-  "Faz 6 — İhracat & Ölçek":      "bg-rose-500 border-rose-500",
-};
+const statusIcon = (s: TimelineEntry["status"]) =>
+  s === "completed" ? "✓" : s === "ongoing" ? "●" : "○";
+const statusDotClass = (s: TimelineEntry["status"]) =>
+  s === "completed" ? "bg-green-500" : s === "ongoing" ? "bg-yellow-400" : "bg-gray-300";
 
 export default function Home() {
   const [selected, setSelected] = useState(0);
   const entry = timelineData[selected];
+  const style = phaseStyle[entry.phase];
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <p className="text-sm font-medium text-blue-600 mb-1">
-            KEREGE Yazılım Bilişim Teknolojileri A.Ş.
-          </p>
-          <h1 className="text-2xl font-bold text-gray-900">AffectLog-TR</h1>
-          <p className="text-gray-500 mt-1">
-            Dijital Psikolojik Destek Platformu — 24 Aylık Proje Zaman Çizelgesi
-          </p>
-          <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-600">
-            <span><span className="font-medium">Başlangıç:</span> 05.12.2025</span>
-            <span><span className="font-medium">Bitiş:</span> 05.12.2027</span>
-            <span><span className="font-medium">Yönetici:</span> Önder Öztürk</span>
-            <span><span className="font-medium">Bütçe:</span> 4.092.000 TL</span>
+    <div className="flex flex-col min-h-screen bg-gray-50 font-sans">
+
+      {/* ── TOP HEADER ── */}
+      <header className="bg-white border-b border-gray-200 shrink-0">
+        <div className="px-6 py-5 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-0.5">
+              KEREGE Yazılım Bilişim Teknolojileri A.Ş.
+            </p>
+            <h1 className="text-xl font-bold text-gray-900">AffectLog-TR</h1>
+            <p className="text-sm text-gray-500">Dijital Psikolojik Destek Platformu — 24 Aylık Proje Zaman Çizelgesi</p>
           </div>
-          <div className="flex flex-wrap gap-2 mt-4">
-            {Object.entries(phaseColors).map(([phase, cls]) => (
-              <span key={phase} className={`inline-flex flex-col items-start text-xs font-medium px-2.5 py-1.5 rounded-lg ${cls}`}>
-                <span className="font-semibold">{phase}</span>
-                <span className="opacity-70 font-normal">{phaseRanges[phase]}</span>
-              </span>
-            ))}
+          <div className="flex flex-wrap gap-3 text-xs text-gray-500 mt-1">
+            <span><span className="font-medium text-gray-700">Başlangıç:</span> 05.12.2025</span>
+            <span><span className="font-medium text-gray-700">Bitiş:</span> 05.12.2027</span>
+            <span><span className="font-medium text-gray-700">Yönetici:</span> Önder Öztürk</span>
+            <span><span className="font-medium text-gray-700">Bütçe:</span> 4.092.000 TL</span>
           </div>
         </div>
       </header>
 
-      {/* Horizontal Timeline Bar */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
-        <div className="max-w-6xl mx-auto px-6 py-4 overflow-x-auto">
-          <div className="flex items-end min-w-max">
-            {timelineData.map((item, i) => {
-              const nodeColor =
-                item.status === "completed"
-                  ? "bg-green-500 border-green-500 text-white"
-                  : item.status === "ongoing"
-                  ? "bg-yellow-400 border-yellow-400 text-white"
-                  : `${phaseNodeColors[item.phase]} text-white opacity-50`;
-              const selectedStyle = selected === i
-                ? "ring-2 ring-offset-2 ring-gray-400 opacity-100 scale-110 shadow-md"
-                : "";
+      {/* ── BODY ── */}
+      <div className="flex flex-1 overflow-hidden">
 
+        {/* ── SIDEBAR ── */}
+        <aside className="w-64 shrink-0 bg-white border-r border-gray-200 overflow-y-auto">
+          <nav className="py-3">
+            {phases.map((faz) => {
+              const s = phaseStyle[faz.name];
+              const months = timelineData.filter((d) => d.phase === faz.name);
               return (
-                <div key={i} className="flex items-end">
-                  <button onClick={() => setSelected(i)} className="flex flex-col items-center">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${nodeColor} ${selectedStyle}`}>
-                      {item.status === "completed" ? "✓" : item.status === "ongoing" ? "●" : i + 1}
-                    </div>
-                    <div className="mt-1.5 text-center">
-                      <p className={`text-xs font-semibold whitespace-nowrap ${selected === i ? "text-gray-900" : "text-gray-500"}`}>
-                        {item.period}
-                      </p>
-                    </div>
-                  </button>
-                  {i < timelineData.length - 1 && (
-                    <div className="w-8 h-0.5 mb-6 bg-gray-200 shrink-0" />
-                  )}
+                <div key={faz.name} className="mb-1">
+                  {/* Phase header */}
+                  <div className={`mx-2 px-3 py-2 rounded-lg ${s.bg} border ${s.border}`}>
+                    <p className={`text-xs font-bold ${s.text}`}>{faz.name}</p>
+                    <p className={`text-xs opacity-70 ${s.text}`}>{faz.range}</p>
+                  </div>
+                  {/* Months */}
+                  <ul className="mt-1 mb-2">
+                    {months.map((m) => {
+                      const idx = timelineData.indexOf(m);
+                      const isActive = selected === idx;
+                      return (
+                        <li key={idx}>
+                          <button
+                            onClick={() => setSelected(idx)}
+                            className={`w-full flex items-center gap-2.5 px-5 py-2 text-left transition-colors
+                              ${isActive
+                                ? `${s.bg} ${s.text} font-semibold`
+                                : "text-gray-600 hover:bg-gray-50"
+                              }`}
+                          >
+                            <span className={`w-2 h-2 rounded-full shrink-0 ${statusDotClass(m.status)}`} />
+                            <span className="text-sm truncate">{m.period}</span>
+                            <span className="ml-auto text-xs opacity-50">{statusIcon(m.status)}</span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
                 </div>
               );
             })}
-          </div>
-        </div>
-      </div>
+          </nav>
+        </aside>
 
-      {/* Detail Panel */}
-      <main className="max-w-6xl mx-auto px-6 py-8">
-        <div className="mb-6 flex flex-wrap items-center gap-3">
-          <h2 className="text-xl font-bold text-gray-900">{entry.period}</h2>
-          <span className="text-sm text-gray-500">{entry.subtitle}</span>
-          <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${phaseColors[entry.phase]}`}>
-            {entry.phase}
-          </span>
-          {entry.status === "completed" && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-              <span className="h-1.5 w-1.5 rounded-full bg-green-500" /> Tamamlandı
-            </span>
-          )}
-          {entry.status === "ongoing" && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700">
-              <span className="h-1.5 w-1.5 rounded-full bg-yellow-400" /> Devam Ediyor
-            </span>
-          )}
-          {entry.status === "planned" && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">
-              <span className="h-1.5 w-1.5 rounded-full bg-gray-400" /> Planlandı
-            </span>
-          )}
-        </div>
-        <p className="text-gray-600 mb-6">{entry.summary}</p>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
-              <h3 className="text-sm font-semibold text-gray-700">
-                {entry.status === "completed" ? "Dönem İçinde Tamamlananlar" : "Planlanan Faaliyetler"}
-              </h3>
+        {/* ── MAIN CONTENT ── */}
+        <main className="flex-1 overflow-y-auto p-6">
+          {/* Period title */}
+          <div className="mb-5">
+            <div className="flex flex-wrap items-center gap-3 mb-1">
+              <h2 className="text-2xl font-bold text-gray-900">{entry.period}</h2>
+              <span className="text-sm text-gray-400">{entry.subtitle}</span>
+              <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${style.bg} ${style.text} border ${style.border}`}>
+                {entry.phase}
+              </span>
+              {entry.status === "completed" && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-500" /> Tamamlandı
+                </span>
+              )}
+              {entry.status === "ongoing" && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700">
+                  <span className="h-1.5 w-1.5 rounded-full bg-yellow-400" /> Devam Ediyor
+                </span>
+              )}
+              {entry.status === "planned" && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">
+                  <span className="h-1.5 w-1.5 rounded-full bg-gray-300" /> Planlandı
+                </span>
+              )}
             </div>
-            <div className="divide-y divide-gray-100">
-              {entry.items.map((cat, j) => (
-                <div key={j} className="px-4 py-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">
-                    {cat.category}
-                  </p>
-                  <ul className="space-y-1.5">
-                    {cat.items.map((item, k) => (
-                      <li key={k} className="flex gap-2 text-sm text-gray-700">
-                        <span className={`mt-0.5 shrink-0 ${entry.status === "completed" ? "text-green-500" : "text-blue-400"}`}>
-                          {entry.status === "completed" ? "✓" : "→"}
-                        </span>
+            <p className="text-gray-500">{entry.summary}</p>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+            {/* Activities */}
+            <div className="xl:col-span-2 bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                <h3 className="text-sm font-semibold text-gray-700">
+                  {entry.status === "completed" ? "Dönem İçinde Tamamlananlar" : "Planlanan Faaliyetler"}
+                </h3>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {entry.items.map((cat, j) => (
+                  <div key={j} className="px-4 py-4">
+                    <p className={`text-xs font-bold uppercase tracking-wider mb-2 ${style.text}`}>
+                      {cat.category}
+                    </p>
+                    <ul className="space-y-2">
+                      {cat.items.map((item, k) => (
+                        <li key={k} className="flex gap-2 text-sm text-gray-700">
+                          <span className={`mt-0.5 shrink-0 ${entry.status === "completed" ? "text-green-500" : "text-blue-400"}`}>
+                            {entry.status === "completed" ? "✓" : "→"}
+                          </span>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right column */}
+            <div className="flex flex-col gap-4">
+              {entry.status === "completed" && entry.pending.length > 0 && (
+                <div className="bg-white rounded-xl border border-amber-200 overflow-hidden">
+                  <div className="px-4 py-3 bg-amber-50 border-b border-amber-200">
+                    <h3 className="text-sm font-semibold text-amber-700">Ertelenenler</h3>
+                  </div>
+                  <ul className="divide-y divide-amber-50">
+                    {entry.pending.map((item, j) => (
+                      <li key={j} className="flex gap-2 px-4 py-3 text-sm text-gray-700">
+                        <span className="mt-0.5 shrink-0 text-amber-400">⏳</span>
                         {item}
                       </li>
                     ))}
                   </ul>
                 </div>
-              ))}
+              )}
+
+              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    {entry.status === "completed" ? "Dönem Çıktıları" : "Beklenen Çıktılar"}
+                  </h3>
+                </div>
+                <div className="flex flex-wrap gap-2 px-4 py-4">
+                  {entry.outputs.map((o, j) => (
+                    <span key={j} className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium ring-1 ring-inset
+                      ${entry.status === "completed"
+                        ? "bg-blue-50 text-blue-700 ring-blue-700/10"
+                        : "bg-gray-50 text-gray-600 ring-gray-500/10"}`}>
+                      {o}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Navigation buttons */}
+              <div className="flex gap-2">
+                {selected > 0 && (
+                  <button onClick={() => setSelected(selected - 1)}
+                    className="flex-1 py-2 px-3 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    ← {timelineData[selected - 1].period}
+                  </button>
+                )}
+                {selected < timelineData.length - 1 && (
+                  <button onClick={() => setSelected(selected + 1)}
+                    className="flex-1 py-2 px-3 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    {timelineData[selected + 1].period} →
+                  </button>
+                )}
+              </div>
             </div>
           </div>
+        </main>
+      </div>
 
-          <div className="flex flex-col gap-4">
-            {entry.status === "completed" && entry.pending.length > 0 && (
-              <div className="bg-white rounded-xl border border-amber-200 overflow-hidden">
-                <div className="px-4 py-3 bg-amber-50 border-b border-amber-200">
-                  <h3 className="text-sm font-semibold text-amber-700">Ertelenenler</h3>
-                </div>
-                <ul className="divide-y divide-amber-50">
-                  {entry.pending.map((item, j) => (
-                    <li key={j} className="flex gap-2 px-4 py-3 text-sm text-gray-700">
-                      <span className="mt-0.5 shrink-0 text-amber-400">⏳</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-700">
-                  {entry.status === "completed" ? "Dönem Çıktıları" : "Beklenen Çıktılar"}
-                </h3>
-              </div>
-              <div className="flex flex-wrap gap-2 px-4 py-4">
-                {entry.outputs.map((output, j) => (
-                  <span key={j} className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium ring-1 ring-inset
-                    ${entry.status === "completed"
-                      ? "bg-blue-50 text-blue-700 ring-blue-700/10"
-                      : "bg-gray-50 text-gray-600 ring-gray-500/10"}`}>
-                    {output}
-                  </span>
-                ))}
-              </div>
+      {/* ── FOOTER ── */}
+      <footer className="bg-gray-900 text-gray-300 shrink-0">
+        <div className="max-w-6xl mx-auto px-6 py-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Company */}
+            <div>
+              <h3 className="text-white font-bold text-sm mb-3">KEREGE Yazılım</h3>
+              <p className="text-xs leading-relaxed text-gray-400">
+                KEREGE Yazılım Bilişim Teknolojileri A.Ş., sağlık teknolojileri alanında
+                yenilikçi dijital çözümler geliştiren Türkiye merkezli bir yazılım şirketidir.
+              </p>
             </div>
+            {/* Project */}
+            <div>
+              <h3 className="text-white font-bold text-sm mb-3">AffectLog-TR Projesi</h3>
+              <ul className="text-xs space-y-1.5 text-gray-400">
+                <li>Proje Kodu: AL-TR-25-DPS-MVP</li>
+                <li>Destekleyen: TÜBİTAK / TGB</li>
+                <li>Başlangıç: 05.12.2025</li>
+                <li>Süre: 24 Ay</li>
+                <li>Proje Yöneticisi: Önder Öztürk</li>
+              </ul>
+            </div>
+            {/* Contact */}
+            <div>
+              <h3 className="text-white font-bold text-sm mb-3">İletişim</h3>
+              <ul className="text-xs space-y-1.5 text-gray-400">
+                <li>info@kerege.com.tr</li>
+                <li>Türkiye</li>
+                <li className="pt-2 text-gray-500">
+                  Bu site TÜBİTAK destekli AffectLog-TR projesinin<br />
+                  ilerleme raporlama platformudur.
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-8 pt-6 flex flex-wrap justify-between items-center gap-3 text-xs text-gray-500">
+            <span>© 2025–2027 KEREGE Yazılım Bilişim Teknolojileri A.Ş. Tüm hakları saklıdır.</span>
+            <span>AffectLog-TR — Dijital Psikolojik Destek Platformu</span>
           </div>
         </div>
-      </main>
+      </footer>
     </div>
   );
 }
