@@ -1334,12 +1334,90 @@ export default function Home() {
                   )}
                 </>
               ) : (
-                /* Listeli format */
-                <ol className="px-4 py-3 space-y-1.5">
-                  {activeSection.items.map((q, qi) => (
-                    <li key={qi} className="text-xs text-slate-700 leading-relaxed">{q}</li>
-                  ))}
-                </ol>
+                /* Listeli format — §STEP§ §HEAD§ §TEXT§ §SUB§ §WARN§ §ALERT§ §QUOTE§ §BULLET§ */
+                <div className="pb-2">
+                  {activeSection.items.map((q, qi) => {
+                    if (q.startsWith("§STEP§")) {
+                      const text = q.slice(6);
+                      return (
+                        <div key={qi} className="mt-1 first:mt-0 px-4 py-2 bg-slate-800 text-white flex items-center gap-2">
+                          <span className="text-[11px] font-bold leading-snug">{text}</span>
+                        </div>
+                      );
+                    }
+                    if (q.startsWith("§HEAD§")) {
+                      const text = q.slice(6);
+                      return (
+                        <div key={qi} className="px-4 pt-3 pb-0.5">
+                          <p className="text-[11px] font-bold text-slate-800">{text}</p>
+                        </div>
+                      );
+                    }
+                    if (q.startsWith("§WARN§")) {
+                      const text = q.slice(6);
+                      return (
+                        <div key={qi} className="mx-4 my-1 rounded bg-red-50 border border-red-200 px-3 py-1.5">
+                          <p className="text-[10px] text-red-800 leading-relaxed">{text}</p>
+                        </div>
+                      );
+                    }
+                    if (q.startsWith("§ALERT§")) {
+                      const text = q.slice(7);
+                      return (
+                        <div key={qi} className="mx-4 my-1.5 rounded border-2 border-slate-400 bg-slate-50 px-3 py-2 flex items-start gap-2">
+                          <span className="shrink-0 text-slate-500 text-[10px] mt-0.5">☐</span>
+                          <p className="text-[10px] font-semibold text-slate-800 leading-relaxed">{text.replace(/^☐\s*/, "")}</p>
+                        </div>
+                      );
+                    }
+                    if (q.startsWith("§SUB§")) {
+                      const text = q.slice(5).replace(/^☐\s*/, "");
+                      const colonIdx = text.indexOf(":");
+                      const hasLabel = colonIdx > 0 && colonIdx < 40;
+                      return (
+                        <div key={qi} className="px-4 pl-9 py-0.5 flex items-start gap-1.5">
+                          <span className="shrink-0 text-slate-400 text-[10px] mt-0.5">☐</span>
+                          <p className="text-[10px] text-slate-700 leading-relaxed">
+                            {hasLabel
+                              ? <><span className="font-semibold text-slate-800">{text.slice(0, colonIdx + 1)}</span>{text.slice(colonIdx + 1)}</>
+                              : text}
+                          </p>
+                        </div>
+                      );
+                    }
+                    if (q.startsWith("§QUOTE§")) {
+                      const text = q.slice(7);
+                      return (
+                        <div key={qi} className="mx-4 my-1.5 rounded bg-sky-50 border border-sky-200 px-3 py-2">
+                          <p className="text-[10px] text-sky-900 italic leading-relaxed">{text}</p>
+                        </div>
+                      );
+                    }
+                    if (q.startsWith("§BULLET§")) {
+                      const text = q.slice(8);
+                      return (
+                        <div key={qi} className="px-4 pl-9 py-0.5 flex items-start gap-1.5">
+                          <span className="shrink-0 text-slate-400 text-[10px] mt-0.5">•</span>
+                          <p className="text-[10px] font-medium text-slate-700 leading-relaxed">{text}</p>
+                        </div>
+                      );
+                    }
+                    if (q.startsWith("§TEXT§")) {
+                      const text = q.slice(6);
+                      return (
+                        <div key={qi} className="px-4 pl-8 py-0.5">
+                          <p className="text-[10px] text-slate-600 leading-relaxed">{text}</p>
+                        </div>
+                      );
+                    }
+                    /* fallback */
+                    return (
+                      <div key={qi} className="px-4 py-0.5">
+                        <p className="text-[11px] text-slate-700 leading-relaxed">{q}</p>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
 
               {/* Interpretation mavi kutu */}
