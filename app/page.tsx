@@ -930,8 +930,8 @@ export default function Home() {
             <p className="text-gray-500">{entry.summary}</p>
           </div>
 
+          {/* Top grid: Dönem Notları + Acil güvenlik left, right 1/3 empty */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-            {/* Sol 2/3 sütun: Dönem Notları + Acil güvenlik + Tamamlananlar */}
             <div className="xl:col-span-2 flex flex-col gap-4">
 
               {/* ── DÖNEM NOTLARI (aya özgü) ── */}
@@ -972,6 +972,14 @@ export default function Home() {
                 </p>
               </section>
 
+            </div>
+            {/* right 1/3 intentionally empty on xl */}
+          </div>
+
+          {/* Bottom grid: Tamamlananlar left, Ertelenenler + Çıktılar + Nav right */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+            <div className="xl:col-span-2">
+
               {/* ── Dönem İçinde Tamamlananlar / Planlanan ── */}
               <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
@@ -1010,9 +1018,10 @@ export default function Home() {
                 ))}
               </div>
               </div>{/* end Tamamlananlar */}
+
             </div>{/* end xl:col-span-2 */}
 
-            {/* Right column */}
+            {/* Right column: Ertelenenler + Çıktılar + Nav */}
             <div className="flex flex-col gap-4">
               {entry.status === "completed" && entry.pending.length > 0 && (
                 <div className="bg-white rounded-xl border border-amber-200 overflow-hidden">
