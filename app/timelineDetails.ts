@@ -192,6 +192,7 @@ export type Section = {
   description: string;
   items: string[];
   scoring: string;
+  trigger?: string; // bullet text içinde bu kelime tıklanabilir link olur
 };
 
 export type RichDetail = {
@@ -231,6 +232,7 @@ export const timelineDetailsRich: Record<string, RichDetail> = {
           "9. Kendine zarar verme ya da \"daha iyi olsaydım ölseydim\" düşünceleri",
         ],
         scoring: "0–4: Minimal · 5–9: Hafif · 10–14: Orta · 15–19: Orta-şiddetli · 20–27: Şiddetli",
+        trigger: "PHQ-9",
       },
       {
         title: "GAD-7 — Yaygın Anksiyete Ölçeği",
@@ -245,6 +247,7 @@ export const timelineDetailsRich: Record<string, RichDetail> = {
           "7. Kötü bir şey olacakmış gibi korku duyma",
         ],
         scoring: "0–4: Minimal · 5–9: Hafif · 10–14: Orta · ≥15: Şiddetli",
+        trigger: "GAD-7",
       },
     ],
   },

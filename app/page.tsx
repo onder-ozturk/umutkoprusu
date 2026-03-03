@@ -750,16 +750,16 @@ export default function Home() {
   const [selected, setSelected] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeDetail, setActiveDetail] = useState<ItemDetail | null>(null);
-  const [showSections, setShowSections] = useState(false);
+  const [openSections, setOpenSections] = useState<Record<number, boolean>>({});
   const entry = timelineData[selected];
   const style = phaseStyle[entry.phase];
 
   const openDetail = (detail: ItemDetail) => {
-    setShowSections(false);
+    setOpenSections({});
     setActiveDetail(detail);
   };
   const closeDetail = () => {
-    setShowSections(false);
+    setOpenSections({});
     setActiveDetail(null);
   };
 
@@ -1140,7 +1140,38 @@ export default function Home() {
               {activeDetail.points.length > 0 && (
                 <ul className="space-y-2.5">
                   {activeDetail.points.map((point, i) => {
-                    const isExpandable = i === 0 && !!activeDetail.sections?.length;
+                    // Collect triggers that appear in this point text
+                    const triggers = (activeDetail.sections ?? [])
+                      .map((sec, si) => sec.trigger && point.includes(sec.trigger) ? { word: sec.trigger, si } : null)
+                      .filter((t): t is { word: string; si: number } => t !== null)
+                      .sort((a, b) => point.indexOf(a.word) - point.indexOf(b.word));
+
+                    // Build inline nodes: plain text interleaved with link buttons
+                    let content: React.ReactNode;
+                    if (triggers.length > 0) {
+                      const nodes: React.ReactNode[] = [];
+                      let cursor = 0;
+                      for (const { word, si } of triggers) {
+                        const pos = point.indexOf(word, cursor);
+                        if (pos > cursor) nodes.push(point.slice(cursor, pos));
+                        nodes.push(
+                          <button
+                            key={`trg-${si}`}
+                            type="button"
+                            onClick={() => setOpenSections(s => ({ ...s, [si]: !s[si] }))}
+                            className="font-semibold text-sky-700 underline decoration-dashed underline-offset-2 hover:text-sky-900 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-sky-400 rounded"
+                          >
+                            {word}
+                          </button>
+                        );
+                        cursor = pos + word.length;
+                      }
+                      if (cursor < point.length) nodes.push(point.slice(cursor));
+                      content = <span className="text-slate-700">{nodes}</span>;
+                    } else {
+                      content = <span className="text-slate-700">{point}</span>;
+                    }
+
                     return (
                       <li key={i} className="flex gap-3 text-sm leading-relaxed">
                         <span className="mt-0.5 shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-sky-100">
@@ -1148,51 +1179,45 @@ export default function Home() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                           </svg>
                         </span>
-                        {isExpandable ? (
-                          <button
-                            type="button"
-                            onClick={() => setShowSections(v => !v)}
-                            className="flex-1 text-left text-sky-700 font-medium underline decoration-dashed underline-offset-2 hover:text-sky-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 rounded cursor-pointer flex items-center gap-1.5"
-                          >
-                            <span>{point}</span>
-                            <svg
-                              className={`w-3.5 h-3.5 shrink-0 transition-transform ${showSections ? "rotate-180" : ""}`}
-                              fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </button>
-                        ) : (
-                          <span className="text-slate-700">{point}</span>
-                        )}
+                        {content}
                       </li>
                     );
                   })}
                 </ul>
               )}
 
-              {/* Expanded test sections (PHQ-9 / GAD-7) */}
-              {showSections && activeDetail.sections && activeDetail.sections.length > 0 && (
-                <div className="space-y-4">
-                  {activeDetail.sections.map((sec, si) => (
-                    <div key={si} className="rounded-xl border border-indigo-100 bg-indigo-50/50 overflow-hidden">
-                      <div className="px-4 py-2.5 bg-indigo-100/70 border-b border-indigo-100">
+              {/* Expandable test sections (PHQ-9 / GAD-7) — per-section toggle */}
+              {activeDetail.sections && activeDetail.sections.map((sec, si) =>
+                openSections[si] ? (
+                  <div key={si} className="rounded-xl border border-indigo-100 bg-indigo-50/50 overflow-hidden">
+                    <div className="px-4 py-2.5 bg-indigo-100/70 border-b border-indigo-100 flex items-start justify-between gap-2">
+                      <div>
                         <h5 className="text-xs font-bold text-indigo-800 uppercase tracking-wider">{sec.title}</h5>
                         <p className="text-[11px] text-indigo-600 mt-0.5 leading-snug">{sec.description}</p>
                       </div>
-                      <ol className="px-4 py-3 space-y-1.5">
-                        {sec.items.map((q, qi) => (
-                          <li key={qi} className="text-xs text-slate-700 leading-relaxed">{q}</li>
-                        ))}
-                      </ol>
-                      <div className="px-4 py-2 bg-indigo-100/50 border-t border-indigo-100">
-                        <p className="text-[11px] font-semibold text-indigo-700">
-                          <span className="mr-1 text-indigo-400">Puanlama:</span>{sec.scoring}
-                        </p>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setOpenSections(s => ({ ...s, [si]: false }))}
+                        className="shrink-0 mt-0.5 flex items-center justify-center w-5 h-5 rounded-full text-indigo-400 hover:text-indigo-700 hover:bg-indigo-200 transition-colors focus:outline-none"
+                        aria-label="Kapat"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
                     </div>
-                  ))}
-                </div>
+                    <ol className="px-4 py-3 space-y-1.5">
+                      {sec.items.map((q, qi) => (
+                        <li key={qi} className="text-xs text-slate-700 leading-relaxed">{q}</li>
+                      ))}
+                    </ol>
+                    <div className="px-4 py-2 bg-indigo-100/50 border-t border-indigo-100">
+                      <p className="text-[11px] font-semibold text-indigo-700">
+                        <span className="mr-1 text-indigo-400">Puanlama:</span>{sec.scoring}
+                      </p>
+                    </div>
+                  </div>
+                ) : null
               )}
 
               {/* Tags */}
