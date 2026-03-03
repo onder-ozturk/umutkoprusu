@@ -981,7 +981,7 @@ export default function Home() {
                             <button
                               type="button"
                               onClick={() => setActiveDetail(getItemDetail(entry.period, cat.category, item))}
-                              className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-sky-300 bg-sky-50 text-[11px] font-bold text-sky-700 hover:bg-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                              className="cursor-pointer inline-flex h-5 w-5 items-center justify-center rounded-full border border-sky-300 bg-sky-50 text-[11px] font-bold text-sky-700 hover:bg-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                               aria-label={`Detayı aç: ${item}`}
                               title="Detayı gör"
                             >
