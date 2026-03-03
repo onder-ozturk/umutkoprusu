@@ -187,12 +187,17 @@ export const timelineDetails: Record<string, string[]> = {
    Zenginleştirilmiş popup verileri  (lead · points · tags)
    Şu an yalnızca Aralık 2025 — 12 madde tanımlı.
    ───────────────────────────────────────────────────────────────── */
+export type ScoringRow = { score: string; severity: string; action: string };
+
 export type Section = {
   title: string;
   description: string;
   items: string[];
   scoring: string;
-  trigger?: string; // bullet text içinde bu kelime tıklanabilir link olur
+  trigger?: string;
+  format?: "list" | "questionnaire";
+  scoringTable?: ScoringRow[];
+  notes?: string[];
 };
 
 export type RichDetail = {
@@ -218,20 +223,31 @@ export const timelineDetailsRich: Record<string, RichDetail> = {
     tags: ["PHQ-9", "GAD-7", "C-SSRS/ASQ", "Klinik Protokol", "Tarama İlkeleri"],
     sections: [
       {
-        title: "PHQ-9 — Hasta Sağlık Anketi",
-        description: "Son 2 hafta içinde aşağıdaki sorunlar sizi ne sıklıkla rahatsız etti? (0 = Tam olarak değil · 1 = Birkaç gün · 2 = Günlerin yarısından fazlası · 3 = Neredeyse her gün)",
+        title: "Hasta Sağlık Anketi-9 (PHQ-9)",
+        description: "PHQ-9, depresyonun taranması, teşhisi, izlenmesi ve şiddetinin ölçülmesi için kullanılan çok amaçlı bir araçtır.",
+        format: "questionnaire",
         items: [
-          "1. Bir şeyler yapmaktan pek ilgi veya zevk duymuyorum.",
-          "2. Kendinizi moralsiz, depresif veya umutsuz hissediyorsunuz.",
-          "3. Uykuya dalmada, uykuyu sürdürmede veya çok fazla uyumada zorluk çekme.",
-          "4. Yorgun hissetmek veya enerjinizin düşük olması.",
-          "5. İştahsızlık veya aşırı yeme.",
-          "6. Kendinizi kötü hissetmek — veya başarısız olduğunuzu, kendinizi veya ailenizi hayal kırıklığına uğrattığınızı düşünmek.",
-          "7. Gazete okumak veya televizyon izlemek gibi şeylere odaklanmakta zorluk çekmek.",
-          "8. Başkalarının fark edebileceği kadar yavaş hareket etmek veya konuşmak; ya da tam tersi — normalden çok daha fazla hareket etmenize neden olacak kadar huzursuz veya yerinde duramayan olmak.",
-          "9. Ölmenin ya da kendine bir şekilde zarar vermenin daha iyi olacağı düşünceleri.",
+          "Bir şeyler yapmaktan pek ilgi veya zevk duymuyorum.",
+          "Kendinizi moralsiz, depresif veya umutsuz hissediyorsunuz.",
+          "Uykuya dalmada, uykuyu sürdürmede veya çok fazla uyumada zorluk çekme.",
+          "Yorgun hissetmek veya enerjinizin düşük olması.",
+          "İştahsızlık veya aşırı yeme.",
+          "Kendinizi kötü hissetmek - veya başarısız olduğunuzu, kendinizi veya ailenizi hayal kırıklığına uğrattığınızı düşünmek.",
+          "Gazete okumak veya televizyon izlemek gibi şeylere odaklanmakta zorluk çekmek.",
+          "Başkalarının fark edebileceği kadar yavaş hareket etmek veya konuşmak. Ya da tam tersi - normalden çok daha fazla hareket etmenize neden olacak kadar huzursuz veya yerinde duramayan olmak.",
+          "Ölmenin ya da kendine bir şekilde zarar vermenin daha iyi olacağı düşünceleri.",
         ],
-        scoring: "0–4: Hiçbiri-minimal · 5–9: Hafif · 10–14: Orta · 15–19: Orta-şiddetli · 20–27: Şiddetli",
+        scoring: "PHQ-9 puanı, her sorunun puanının toplanmasıyla elde edilir (toplam puan).",
+        scoringTable: [
+          { score: "0 – 4",  severity: "Hiçbiri-minimal",  action: "Yok" },
+          { score: "5 – 9",  severity: "Hafif",             action: "Bekle ve izle; takipte PHQ-9 tekrarı" },
+          { score: "10 – 14", severity: "Orta",             action: "Tedavi planı; danışmanlık, takip ve/veya farmakoterapi" },
+          { score: "15 – 19", severity: "Orta-şiddetli",   action: "Farmakoterapi ve/veya psikoterapi ile aktif tedavi" },
+          { score: "20 – 27", severity: "Şiddetli",         action: "Farmakoterapi başlangıcı; ağır bozulma durumunda ruh sağlığı uzmanına acil sevk" },
+        ],
+        notes: [
+          "9. soru, intihar riskine yönelik tek bir tarama sorusudur. Bu soruya olumlu yanıt veren hastanın intihar riski, konuda yetkin bir uzman tarafından daha ileri düzeyde değerlendirilmelidir.",
+        ],
         trigger: "PHQ-9",
       },
       {
