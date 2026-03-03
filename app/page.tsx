@@ -538,6 +538,26 @@ const statusDotClass = (s: TimelineEntry["status"]) =>
 const statusLabel = (s: TimelineEntry["status"]) =>
   s === "completed" ? "Tamamlandı" : s === "ongoing" ? "Devam Ediyor" : "Planlandı";
 
+const TODAY_STAMP = "03.03.2026";
+
+const contentUpgradeItems = [
+  "03.03.2026 durum özeti eklendi: Aralık 2025 tamamlandı, Ocak 2026 devam ediyor, Şubat 2026 planlandı, Mart 2026 planlandı.",
+  "Durum güncelleme standardı tanımlandı: her ay kapanışında dönem statüsü (completed/ongoing/planned) revize edilecek.",
+  "KPI zorunluluğu tanımlandı: her dönem en az 1 klinik etki, 1 operasyon ve 1 deneyim metriği ile takip edilecek.",
+  "Risk günlüğü standardı eklendi: her dönem için en az 3 risk, aksiyon planı ve sorumlu kişi yazılacak.",
+  "Bağımlılık kapıları netleştirildi: Etik kurul onayı, USVS/SKRS/FHIR erişimi ve ISO süreçleri kritik geçit olarak izlenecek.",
+  "Sorumluluk matrisi şablonu eklendi: Klinik Lider, Ürün Sahibi, Teknik Lider ve Kurum Koordinatörü bazında sahiplik atanacak.",
+  "Kanıt bağlantısı standardı eklendi: dönem çıktıları belge sürümü ve tarih bilgisiyle doğrulanacak.",
+];
+
+function NewStamp() {
+  return (
+    <span className="inline-flex shrink-0 items-center rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold text-sky-700">
+      🆕 {TODAY_STAMP}
+    </span>
+  );
+}
+
 export default function Home() {
   const [selected, setSelected] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -697,6 +717,31 @@ export default function Home() {
             </div>
             <p className="text-gray-500">{entry.summary}</p>
           </div>
+
+          <section className="mb-5 rounded-xl border border-sky-200 bg-sky-50/80 overflow-hidden">
+            <div className="px-4 py-3 border-b border-sky-200 bg-sky-100/70 flex items-center justify-between gap-2">
+              <h3 className="text-sm font-semibold text-sky-900">İçerik Güçlendirme Notları</h3>
+              <NewStamp />
+            </div>
+            <ul className="divide-y divide-sky-100">
+              {contentUpgradeItems.map((item) => (
+                <li key={item} className="px-4 py-3 text-sm text-sky-900 flex flex-wrap items-start justify-between gap-2">
+                  <span>{item}</span>
+                  <NewStamp />
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+            <p className="text-sm text-red-800 flex flex-wrap items-start justify-between gap-2">
+              <span>
+                Acil güvenlik notu: Bu platform bilgilendirme amaçlı bir proje yol haritası sunar. Acil risk durumunda
+                112 veya Alo 183 ile derhal iletişime geçilmelidir.
+              </span>
+              <NewStamp />
+            </p>
+          </section>
 
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
             {/* Activities */}
