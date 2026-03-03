@@ -197,7 +197,12 @@ export type Section = {
   trigger?: string;
   format?: "list" | "questionnaire";
   scoringTable?: ScoringRow[];
-  notes?: string[];
+  interpretationText?: string;
+  interpretationItems?: string[];
+  interpretationNote?: string;
+  performanceTable?: { test: string; sensitivity: string; specificity: string; plr: string }[];
+  sources?: string[];
+  acknowledgement?: string;
 };
 
 export type RichDetail = {
@@ -239,14 +244,20 @@ export const timelineDetailsRich: Record<string, RichDetail> = {
         ],
         scoring: "PHQ-9 puanı, her sorunun puanının toplanmasıyla elde edilir (toplam puan).",
         scoringTable: [
-          { score: "0 – 4",  severity: "Hiçbiri-minimal",  action: "Yok" },
-          { score: "5 – 9",  severity: "Hafif",             action: "Bekle ve izle; takipte PHQ-9 tekrarı" },
-          { score: "10 – 14", severity: "Orta",             action: "Tedavi planı; danışmanlık, takip ve/veya farmakoterapi" },
-          { score: "15 – 19", severity: "Orta-şiddetli",   action: "Farmakoterapi ve/veya psikoterapi ile aktif tedavi" },
-          { score: "20 – 27", severity: "Şiddetli",         action: "Farmakoterapi başlangıcı; ağır bozulma durumunda ruh sağlığı uzmanına acil sevk" },
+          { score: "0 – 4",   severity: "Hiçbiri-minimal",  action: "Yok" },
+          { score: "5 – 9",   severity: "Hafif",             action: "Bekle ve izle; takipte PHQ-9 tekrarı" },
+          { score: "10 – 14", severity: "Orta",              action: "Tedavi planı; danışmanlık, takip ve/veya farmakoterapi" },
+          { score: "15 – 19", severity: "Orta-şiddetli",    action: "Farmakoterapi ve/veya psikoterapi ile aktif tedavi" },
+          { score: "20 – 27", severity: "Şiddetli",          action: "Farmakoterapi başlangıcı; ağır bozulma veya yanıtsızlık durumunda ruh sağlığı uzmanına acil sevk" },
         ],
-        notes: [
-          "9. soru, intihar riskine yönelik tek bir tarama sorusudur. Bu soruya olumlu yanıt veren hastanın intihar riski, konuda yetkin bir uzman tarafından daha ileri düzeyde değerlendirilmelidir.",
+        interpretationItems: [
+          "5, 10, 15 ve 20 toplam puanları; sırasıyla hafif, orta, orta-şiddetli ve şiddetli depresyon için kesim noktalarını temsil etmektedir.",
+          "Not: 9. soru, intihar riskine yönelik tek bir tarama sorusudur. Bu soruya olumlu yanıt veren hastanın intihar riski, konuda yetkin bir uzman tarafından daha ileri düzeyde değerlendirilmelidir.",
+        ],
+        sources: [
+          "Kroenke K, Spitzer RL, Williams JB. The Patient Health Questionnaire-2: Validity of a Two-Item Depression Screener. Medical Care. 2003;41:1284-92.",
+          "Kroenke K, Spitzer RL, Williams JB. The PHQ-9: validity of a brief depression severity measure. J Gen Intern Med. 2001;16:606-13.",
+          "Kroenke K, Spitzer RL. The PHQ-9: a new depression diagnostic and severity measure. Psychiatr Ann. 2002;32:509-21.",
         ],
         trigger: "PHQ-9",
       },
@@ -265,15 +276,32 @@ export const timelineDetailsRich: Record<string, RichDetail> = {
         ],
         scoring: "GAD-7 puanı, her sorunun puanının toplanmasıyla elde edilir (toplam puan).",
         scoringTable: [
-          { score: "0 – 4",  severity: "Minimal anksiyete", action: "Yok" },
-          { score: "5 – 9",  severity: "Hafif anksiyete",   action: "Bekle ve izle; takipte GAD-7 tekrarı" },
-          { score: "10 – 14", severity: "Orta anksiyete",   action: "Tedavi planı; danışmanlık ve/veya farmakoterapi değerlendir" },
+          { score: "0 – 4",  severity: "Minimal anksiyete",  action: "Yok" },
+          { score: "5 – 9",  severity: "Hafif anksiyete",    action: "Bekle ve izle; takipte GAD-7 tekrarı" },
+          { score: "10 – 14", severity: "Orta anksiyete",    action: "Tedavi planı; danışmanlık ve/veya farmakoterapi değerlendir" },
           { score: "≥ 15",   severity: "Şiddetli anksiyete", action: "Aktif farmakoterapi ve/veya psikoterapi; uzman yönlendirmesi" },
         ],
-        notes: [
-          "Anksiyete bozukluklarının taranmasında 8 veya daha yüksek puan, olası yaygın anksiyete bozukluğu vakalarını belirlemek için makul bir kesim noktasını temsil etmektedir; bu eşikte GAD-7'nin duyarlılığı %92, özgüllüğü %76'dır.",
-          "GAD-7; Panik Bozukluğu, Sosyal Anksiyete Bozukluğu ve Travma Sonrası Stres Bozukluğu için de tarama aracı olarak kullanılabilir (≥10 kesim değerinde).",
+        interpretationText: "Anksiyete bozukluklarının taranmasında 8 veya daha yüksek puan, olası yaygın anksiyete bozukluğu vakalarını belirlemek için makul bir kesim noktasını temsil etmektedir; anksiyete bozukluğunun varlığı ve türünü belirlemek için daha ileri tanısal değerlendirme gerekmektedir. 8 kesim değerinde GAD-7'nin duyarlılığı %92, özgüllüğü %76'dır.",
+        interpretationItems: [
+          "Puan 0–4: Minimal Anksiyete",
+          "Puan 5–9: Hafif Anksiyete",
+          "Puan 10–14: Orta Anksiyete",
+          "Puan >15: Şiddetli Anksiyete",
         ],
+        interpretationNote: "Yakın tarihli bir meta-analize dayanarak bazı uzmanlar, duyarlılığı özgüllükten ödün vermeksizin optimize etmek amacıyla 8 kesim değerinin kullanılmasını önermektedir.",
+        performanceTable: [
+          { test: "Yaygın Anksiyete Bozukluğu",       sensitivity: "%89", specificity: "%82", plr: "5.1" },
+          { test: "Panik Bozukluğu",                   sensitivity: "%74", specificity: "%81", plr: "3.9" },
+          { test: "Sosyal Anksiyete Bozukluğu",        sensitivity: "%72", specificity: "%80", plr: "3.6" },
+          { test: "Travma Sonrası Stres Bozukluğu",    sensitivity: "%66", specificity: "%81", plr: "3.5" },
+          { test: "Herhangi bir anksiyete bozukluğu",  sensitivity: "%68", specificity: "%88", plr: "5.5" },
+        ],
+        sources: [
+          "Spitzer RL, Kroenke K, Williams JB, Löwe B. A brief measure for assessing generalized anxiety disorder: the GAD-7. Arch Intern Med. 2006;166:1092-7.",
+          "Plummer F, Manea L, Trepel D, McMillan D. Screening for anxiety disorders with the GAD-7 and GAD-2: a systematic review and diagnostic metaanalysis. Gen Hosp Psychiatry. 2016;39:24-31.",
+          "Kroenke K, Spitzer RL, Williams JB, Monahan PO, Löwe B. Anxiety disorders in primary care: prevalence, impairment, comorbidity, and detection. Ann Intern Med. 2007;146:317-25.",
+        ],
+        acknowledgement: "GAD-7, Drs. Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke ve meslektaşları tarafından Pfizer Inc. eğitim hibesiyle geliştirilmiştir. Çoğaltma, çeviri, gösterim veya dağıtım için izin gerekmemektedir.",
         trigger: "GAD-7",
       },
     ],

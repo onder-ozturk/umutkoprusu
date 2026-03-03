@@ -1329,14 +1329,73 @@ export default function Home() {
                 </ol>
               )}
 
-              {/* Notlar */}
-              {activeSection.notes && activeSection.notes.length > 0 && (
-                <div className="px-4 py-3 bg-blue-50 border-t border-blue-100">
-                  <ul className="space-y-1.5">
-                    {activeSection.notes.map((note, ni) => (
-                      <li key={ni} className="text-[11px] text-blue-800 leading-relaxed">• {note}</li>
+              {/* Interpretation mavi kutu */}
+              {(activeSection.interpretationText || (activeSection.interpretationItems && activeSection.interpretationItems.length > 0)) && (
+                <div className="mx-4 my-3 rounded-lg bg-sky-50 border border-sky-200 px-4 py-3">
+                  <p className="text-[10px] font-semibold text-sky-800 mb-1.5">Yorum:</p>
+                  {activeSection.interpretationText && (
+                    <p className="text-[11px] text-sky-900 leading-relaxed mb-2">{activeSection.interpretationText}</p>
+                  )}
+                  {activeSection.interpretationItems && activeSection.interpretationItems.length > 0 && (
+                    <ul className="space-y-1 mb-2">
+                      {activeSection.interpretationItems.map((item, ii) => (
+                        <li key={ii} className="text-[11px] text-sky-900 leading-relaxed">• {item}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {activeSection.interpretationNote && (
+                    <p className="text-[11px] text-sky-700 italic leading-relaxed">{activeSection.interpretationNote}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Performans tablosu (GAD-7) */}
+              {activeSection.performanceTable && activeSection.performanceTable.length > 0 && (
+                <div className="border-t border-slate-200">
+                  <div className="px-4 py-2 bg-slate-600">
+                    <p className="text-[10px] font-semibold text-white">Anksiyete Bozukluklarında Tarama Aracı Olarak Performans</p>
+                    <p className="text-[9px] text-slate-300 mt-0.5">(GAD-7 Puan Kesim Değeri ≥10 kullanılarak)</p>
+                  </div>
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-slate-700 text-white">
+                        <th className="px-3 py-2 text-left text-[9px] font-semibold border-r border-slate-600">Test</th>
+                        <th className="px-3 py-2 text-center text-[9px] font-semibold border-r border-slate-600">Duyarlılık</th>
+                        <th className="px-3 py-2 text-center text-[9px] font-semibold border-r border-slate-600">Özgüllük</th>
+                        <th className="px-3 py-2 text-center text-[9px] font-semibold">PLR</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activeSection.performanceTable.map((row, ri) => (
+                        <tr key={ri} className={`border-b border-slate-100 ${ri % 2 === 0 ? "bg-white" : "bg-slate-50"}`}>
+                          <td className="px-3 py-1.5 text-[10px] text-slate-700 border-r border-slate-200">{row.test}</td>
+                          <td className="px-3 py-1.5 text-[10px] text-slate-700 border-r border-slate-200 text-center">{row.sensitivity}</td>
+                          <td className="px-3 py-1.5 text-[10px] text-slate-700 border-r border-slate-200 text-center">{row.specificity}</td>
+                          <td className="px-3 py-1.5 text-[10px] text-slate-700 text-center">{row.plr}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Kaynaklar */}
+              {activeSection.sources && activeSection.sources.length > 0 && (
+                <div className="px-4 py-3 border-t border-slate-200 bg-slate-50">
+                  <p className="text-[10px] font-semibold text-slate-700 mb-1.5">Kaynaklar</p>
+                  <ol className="space-y-1">
+                    {activeSection.sources.map((src, si) => (
+                      <li key={si} className="text-[10px] text-slate-600 leading-relaxed">{si + 1}. {src}</li>
                     ))}
-                  </ul>
+                  </ol>
+                </div>
+              )}
+
+              {/* Acknowledgement */}
+              {activeSection.acknowledgement && (
+                <div className="px-4 py-3 border-t border-slate-200 bg-slate-50">
+                  <p className="text-[10px] font-semibold text-slate-700 mb-1">Teşekkür</p>
+                  <p className="text-[10px] text-slate-600 leading-relaxed">{activeSection.acknowledgement}</p>
                 </div>
               )}
             </div>
