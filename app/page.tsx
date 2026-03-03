@@ -541,32 +541,16 @@ export default function Home() {
   const style = phaseStyle[entry.phase];
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 font-sans">
+    <div className="flex min-h-screen bg-gray-50 font-sans">
 
-      {/* ── TOP HEADER ── */}
-      <header className="bg-white border-b border-gray-200 shrink-0">
-        <div className="px-6 py-5 flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-0.5">
-              KEREGE Yazılım Bilişim Teknolojileri A.Ş.
-            </p>
-            <h1 className="text-xl font-bold text-gray-900">AffectLog-TR</h1>
-            <p className="text-sm text-gray-500">Dijital Psikolojik Destek Platformu — 24 Aylık Proje Zaman Çizelgesi</p>
-          </div>
-          <div className="flex flex-wrap gap-3 text-xs text-gray-500 mt-1">
-            <span><span className="font-medium text-gray-700">Başlangıç:</span> 05.12.2025</span>
-            <span><span className="font-medium text-gray-700">Bitiş:</span> 05.12.2027</span>
-            <span><span className="font-medium text-gray-700">Yönetici:</span> Önder Öztürk</span>
-            <span><span className="font-medium text-gray-700">Bütçe:</span> 4.092.000 TL</span>
-          </div>
+      {/* ── SIDEBAR ── full height */}
+      <aside className="w-64 shrink-0 bg-white border-r border-gray-200 flex flex-col">
+        {/* Sidebar top brand */}
+        <div className="px-4 py-4 border-b border-gray-200 shrink-0">
+          <p className="text-xs font-bold text-blue-600 uppercase tracking-wide">AffectLog-TR</p>
+          <p className="text-xs text-gray-400 mt-0.5">Proje Zaman Çizelgesi</p>
         </div>
-      </header>
-
-      {/* ── BODY ── */}
-      <div className="flex flex-1 overflow-hidden">
-
-        {/* ── SIDEBAR ── */}
-        <aside className="w-64 shrink-0 bg-white border-r border-gray-200 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto">
           <nav className="py-3">
             {phases.map((faz) => {
               const s = phaseStyle[faz.name];
@@ -605,7 +589,30 @@ export default function Home() {
               );
             })}
           </nav>
-        </aside>
+        </div>
+      </aside>
+
+      {/* ── RIGHT SIDE: header + content + footer ── */}
+      <div className="flex flex-col flex-1 min-w-0">
+
+        {/* ── TOP HEADER ── */}
+        <header className="bg-white border-b border-gray-200 shrink-0">
+          <div className="px-6 py-5 flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-0.5">
+                KEREGE Yazılım Bilişim Teknolojileri A.Ş.
+              </p>
+              <h1 className="text-xl font-bold text-gray-900">AffectLog-TR</h1>
+              <p className="text-sm text-gray-500">Dijital Psikolojik Destek Platformu — 24 Aylık Proje Zaman Çizelgesi</p>
+            </div>
+            <div className="flex flex-wrap gap-3 text-xs text-gray-500 mt-1">
+              <span><span className="font-medium text-gray-700">Başlangıç:</span> 05.12.2025</span>
+              <span><span className="font-medium text-gray-700">Bitiş:</span> 05.12.2027</span>
+              <span><span className="font-medium text-gray-700">Yönetici:</span> Önder Öztürk</span>
+              <span><span className="font-medium text-gray-700">Bütçe:</span> 4.092.000 TL</span>
+            </div>
+          </div>
+        </header>
 
         {/* ── MAIN CONTENT ── */}
         <main className="flex-1 overflow-y-auto p-6">
@@ -719,9 +726,8 @@ export default function Home() {
             </div>
           </div>
         </main>
-      </div>
 
-      {/* ── FOOTER ── */}
+        {/* ── FOOTER ── */}
       <footer className="bg-gray-900 text-gray-300 shrink-0">
         <div className="max-w-6xl mx-auto px-6 py-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -763,6 +769,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      </div>{/* end right side */}
     </div>
   );
 }
