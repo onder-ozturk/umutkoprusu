@@ -930,47 +930,50 @@ export default function Home() {
             <p className="text-gray-500">{entry.summary}</p>
           </div>
 
-          {/* ── DÖNEM NOTLARI (aya özgü) ── */}
-          {entry.upgradeNotes.length > 0 && (
-            <section className="mb-5 rounded-xl border border-slate-200 bg-white overflow-hidden">
-              <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between gap-2">
-                <h3 className="text-sm font-semibold text-slate-700">Dönem Notları — {entry.period}</h3>
-                <NewStamp />
-              </div>
-              <ul className="divide-y divide-slate-100">
-                {entry.upgradeNotes.map((note, i) => {
-                  const cs = upgradeCategoryStyle[note.category] ?? {
-                    bg: "bg-gray-50", text: "text-gray-700", border: "border-gray-200", dot: "bg-gray-400",
-                  };
-                  return (
-                    <li key={i} className="px-4 py-3 flex flex-wrap items-start gap-3">
-                      <span className={`shrink-0 mt-0.5 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${cs.bg} ${cs.text} border ${cs.border}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${cs.dot}`} />
-                        {note.category}
-                      </span>
-                      <span className="flex-1 text-sm text-slate-700">{note.note}</span>
-                      <NewStamp />
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          )}
-
-          {/* ── Acil güvenlik notu ── */}
-          <section className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-            <p className="text-sm text-red-800 flex flex-wrap items-start justify-between gap-2">
-              <span>
-                Acil güvenlik notu: Bu platform bilgilendirme amaçlı bir proje yol haritası sunar. Acil risk durumunda
-                112 veya Alo 183 ile derhal iletişime geçilmelidir.
-              </span>
-              <NewStamp />
-            </p>
-          </section>
-
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-            {/* Activities */}
-            <div className="xl:col-span-2 bg-white rounded-xl border border-gray-200 overflow-hidden">
+            {/* Sol 2/3 sütun: Dönem Notları + Acil güvenlik + Tamamlananlar */}
+            <div className="xl:col-span-2 flex flex-col gap-4">
+
+              {/* ── DÖNEM NOTLARI (aya özgü) ── */}
+              {entry.upgradeNotes.length > 0 && (
+                <section className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                  <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between gap-2">
+                    <h3 className="text-sm font-semibold text-slate-700">Dönem Notları — {entry.period}</h3>
+                    <NewStamp />
+                  </div>
+                  <ul className="divide-y divide-slate-100">
+                    {entry.upgradeNotes.map((note, i) => {
+                      const cs = upgradeCategoryStyle[note.category] ?? {
+                        bg: "bg-gray-50", text: "text-gray-700", border: "border-gray-200", dot: "bg-gray-400",
+                      };
+                      return (
+                        <li key={i} className="px-4 py-3 flex flex-wrap items-start gap-3">
+                          <span className={`shrink-0 mt-0.5 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${cs.bg} ${cs.text} border ${cs.border}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${cs.dot}`} />
+                            {note.category}
+                          </span>
+                          <span className="flex-1 text-sm text-slate-700">{note.note}</span>
+                          <NewStamp />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              )}
+
+              {/* ── Acil güvenlik notu ── */}
+              <section className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                <p className="text-sm text-red-800 flex flex-wrap items-start justify-between gap-2">
+                  <span>
+                    Acil güvenlik notu: Bu platform bilgilendirme amaçlı bir proje yol haritası sunar. Acil risk durumunda
+                    112 veya Alo 183 ile derhal iletişime geçilmelidir.
+                  </span>
+                  <NewStamp />
+                </p>
+              </section>
+
+              {/* ── Dönem İçinde Tamamlananlar / Planlanan ── */}
+              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                 <h3 className="text-sm font-semibold text-gray-700">
                   {entry.status === "completed" ? "Dönem İçinde Tamamlananlar" : "Planlanan Faaliyetler"}
@@ -1006,7 +1009,8 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-            </div>
+              </div>{/* end Tamamlananlar */}
+            </div>{/* end xl:col-span-2 */}
 
             {/* Right column */}
             <div className="flex flex-col gap-4">
