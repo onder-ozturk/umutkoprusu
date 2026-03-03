@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 
+type UpgradeNote = { category: string; note: string };
+
 type TimelineEntry = {
   period: string;
   subtitle: string;
@@ -10,6 +12,7 @@ type TimelineEntry = {
   items: { category: string; items: string[] }[];
   pending: string[];
   outputs: string[];
+  upgradeNotes: UpgradeNote[];
 };
 
 const phases = [
@@ -28,6 +31,14 @@ const phaseStyle: Record<string, { bg: string; text: string; dot: string; border
   "Faz 4 — Pilot":                { bg: "bg-green-50",   text: "text-green-700",  dot: "bg-green-500",   border: "border-green-200"  },
   "Faz 5 — Kurumsal Entegrasyon": { bg: "bg-orange-50",  text: "text-orange-700", dot: "bg-orange-500",  border: "border-orange-200" },
   "Faz 6 — İhracat & Ölçek":      { bg: "bg-rose-50",    text: "text-rose-700",   dot: "bg-rose-500",    border: "border-rose-200"   },
+};
+
+const upgradeCategoryStyle: Record<string, { bg: string; text: string; border: string; dot: string }> = {
+  "Durum Notu": { bg: "bg-sky-50",     text: "text-sky-800",     border: "border-sky-200",     dot: "bg-sky-400"     },
+  "KPI":        { bg: "bg-indigo-50",  text: "text-indigo-800",  border: "border-indigo-200",  dot: "bg-indigo-400"  },
+  "Risk":       { bg: "bg-amber-50",   text: "text-amber-800",   border: "border-amber-200",   dot: "bg-amber-400"   },
+  "Bağımlılık": { bg: "bg-orange-50",  text: "text-orange-800",  border: "border-orange-200",  dot: "bg-orange-400"  },
+  "Sorumluluk": { bg: "bg-emerald-50", text: "text-emerald-800", border: "border-emerald-200", dot: "bg-emerald-400" },
 };
 
 const timelineData: TimelineEntry[] = [
@@ -62,6 +73,12 @@ const timelineData: TimelineEntry[] = [
       "FHIR/USVS canlı entegrasyon — kurumsal erişim yetkileri bekleniyor",
     ],
     outputs: ["Araştırma Protokolü v1", "Etik Kurul Başvuru Paketi", "SRS v0.2", "24 Aylık Yol Haritası", "KVKK Politikası", "Kullanıcı Akış Diyagramları"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Tamamlandı. Araştırma Protokolü, SRS v0.2 ve KVKK Politikası teslim edildi. Etik kurul başvurusu Ocak'a devredildi." },
+      { category: "KPI", note: "Etik başvuru paketi ✓ | 24 aylık yol haritası onayı ✓ | 4 klinik çerçeve belgesi ✓ | KVKK politikası taslağı ✓" },
+      { category: "Risk", note: "Etik kurul gecikmesi (orta) → Şubat lansmanını etkileyebilir. Aksiyon: alternatif klinik protokol hazırlığı başlatıldı." },
+      { category: "Sorumluluk", note: "Klinik Lider → etik belgeler | Teknik Lider → veri güvenliği mimarisi | Ürün Sahibi → yol haritası onayı" },
+    ],
   },
   {
     period: "Ocak 2026", subtitle: "2. Dönem", status: "ongoing", phase: "Faz 1 — Temel",
@@ -85,6 +102,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["Klinik İçerik Kütüphanesi v0.1", "Danışman Ağı Listesi", "Kullanıcı Araştırma Raporu", "Triyaj Eşik Değer Belgesi v1"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Devam Ediyor (03.03.2026 itibarıyla). Odak grup görüşmeleri aktif; klinik içerik geliştirme son aşamada." },
+      { category: "KPI", note: "Odak grubu: n=15 hedef | Danışman ağı: ≥5 klinisyen | Triyaj Eşik Belgesi v1 | İçerik Kütüphanesi v0.1 teslimi" },
+      { category: "Risk", note: "Danışman müsaitliği (orta) — üniversite tatil dönemine denk geldi. Bağımlılık: etik onay Şubat'ta bekleniyor." },
+      { category: "Sorumluluk", note: "Klinik Lider → içerik & danışmanlar | Ürün Sahibi → kullanıcı araştırması | Kurum Koordinatörü → görüşmeler" },
+    ],
   },
   {
     period: "Şubat 2026", subtitle: "3. Dönem", status: "planned", phase: "Faz 1 — Temel",
@@ -108,6 +131,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["Etik Kurul Onayı (beklenen)", "Pilot Kurum Mutabakat Mektupları", "Klinik İçerik Kütüphanesi v1.0", "Kurum İhtiyaç Analizi Raporu"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — etik kurul yanıtı bekleniyor; ≥3 pilot kurum ön görüşmesi bu ay tamamlanacak." },
+      { category: "KPI", note: "Etik kurul onayı | ≥3 pilot kurum ön görüşmesi tamamlanmış | Klinik İçerik Kütüphanesi v1.0 teslimi" },
+      { category: "Risk", note: "Etik kurul reddi/revizyonu (orta) — pilot başlangıcını Mart'ın ötesine öteleyebilir. Alternatif hızlı protokol hazır tutulmalı." },
+      { category: "Bağımlılık", note: "Etik onay → sonraki tüm klinik veri toplama faaliyetleri kilitli. Geçit koşulu: onay + pilot mutabakat mektupları." },
+    ],
   },
   {
     period: "Mart 2026", subtitle: "4. Dönem", status: "planned", phase: "Faz 2 — Çekirdek Geliştirme",
@@ -132,6 +161,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["Tarama Modülü v1 (Doğrulanmış)", "Triyaj Akış Diyagramı", "Kriz Yönlendirme Protokolü", "Risk Rozeti Tasarım Kılavuzu"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — Faz 2 ilk ayı. Tarama ve triyaj modüllerinin klinisyen & kullanıcı doğrulaması bu ayın önceliği." },
+      { category: "KPI", note: "PHQ-9/GAD-7 form tamamlama süresi ≤5 dk | Bırakma oranı ≤%20 | Kriz protokolü klinisyen onayı ✓" },
+      { category: "Risk", note: "Klinisyen müsaitliği (orta); mobil test ortamı gecikmesi (düşük); etik onayın hâlâ gelmemiş olma riski (yüksek)." },
+      { category: "Bağımlılık", note: "Etik onay Şubat'ta alınmış olmalı. FHIR test ortamı kurulmuş olmalı. Klinisyen danışman ekibi hazır." },
+    ],
   },
   {
     period: "Nisan 2026", subtitle: "5. Dönem", status: "planned", phase: "Faz 2 — Çekirdek Geliştirme",
@@ -155,6 +190,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["Kısa Müdahale Programları v1 (2 Modül)", "Uzman Paneli Prototip", "KVKK Rıza Ekranları"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — CBT müdahale programları klinisyen onayına giriyor; uzman paneli prototip tasarımı tamamlanıyor." },
+      { category: "KPI", note: "2 müdahale programı klinisyen onayından geçmeli | Uzman paneli prototip SUS ≥65 | KVKK rıza ekranları onaylı" },
+      { category: "Risk", note: "Klinisyen program onay süreci uzayabilir (orta); uzman paneli asenkron mesajlaşma teknik karmaşıklığı." },
+      { category: "Sorumluluk", note: "Klinik Lider → program onayı | Ürün Sahibi → uzman paneli UX | Teknik Lider → güvenli mesajlaşma altyapısı" },
+    ],
   },
   {
     period: "Mayıs 2026", subtitle: "6. Dönem", status: "planned", phase: "Faz 2 — Çekirdek Geliştirme",
@@ -178,6 +219,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["Görüntülü Görüşme Modülü", "Kurumsal Gösterge Paneli", "WCAG 2.1 Uyum Raporu"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — görüntülü görüşme altyapısı, kurumsal raporlama ve WCAG 2.1 AA erişilebilirlik denetimi bu ayın üç ana hedefi." },
+      { category: "KPI", note: "WCAG 2.1 AA tam geçiş | Klinisyen SUS ≥70 (görüntülü görüşme) | Kurumsal panel ≥3 kurum raporlayabilir durumda" },
+      { category: "Risk", note: "WebRTC altyapı gecikmesi (orta); WCAG kritik bulgu çıkarsa geliştirme durabilir (yüksek etki). Erken tarama şart." },
+      { category: "Sorumluluk", note: "Teknik Lider → video altyapısı | Klinik Lider → seans protokolü | Ürün Sahibi → kurumsal rapor UX tasarımı" },
+    ],
   },
   {
     period: "Haziran 2026", subtitle: "7. Dönem", status: "planned", phase: "Faz 2 — Çekirdek Geliştirme",
@@ -200,6 +247,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["Güvenlik Denetim Raporu", "DPIA Belgesi", "3 Patent Teknik Belgesi", "Ticari Marka Başvurusu"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — bağımsız güvenlik denetimi, DPIA ve 3 patent teknik belgesi bu ayın kritik çıktıları." },
+      { category: "KPI", note: "Penetrasyon testi kritik bulgu = 0 | DPIA tamamlanmış | 3 patent teknik belgesi hazır | Ticari marka başvurusu gönderilmiş" },
+      { category: "Risk", note: "Pentest kritik bulgu çıkarsa release durdurulur (yüksek etki) — erken güvenlik taraması paralelde yapılmalı." },
+      { category: "Bağımlılık", note: "Feature freeze → güvenlik denetimi sabit sürüm gerektirir. DPIA → KVKK şartnamesi ve ISO yol haritası." },
+    ],
   },
   {
     period: "Temmuz 2026", subtitle: "8. Dönem", status: "planned", phase: "Faz 2 — Çekirdek Geliştirme",
@@ -218,6 +271,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["USVS/SKRS Entegrasyon Belgesi", "FHIR Mapping v1.0", "Sevk Akış Protokolü"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — USVS/SKRS alan eşlemesi ve HL7 FHIR köprüsü bu ayın teknik önceliği. Faz 2 kapanış ayı." },
+      { category: "KPI", note: "USVS alan eşlemesi %100 tamamlanmış | FHIR test ortamı bağlantısı aktif | Sevk akış protokolü belgelenmiş" },
+      { category: "Risk", note: "Sağlık Bakanlığı API erişim izni alınamayabilir (yüksek) — en kritik risk. Geçici çözüm: manuel import akışı." },
+      { category: "Bağımlılık", note: "SB API erişim izni — kritik geçit. İzin olmadan Ağustos alfa testi FHIR entegrasyonu olmadan yapılacak." },
+    ],
   },
   {
     period: "Ağustos 2026", subtitle: "9. Dönem", status: "planned", phase: "Faz 3 — MVP",
@@ -241,6 +300,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["MVP Alfa v1.0", "Alfa Test Raporu", "Klinisyen Eğitim Materyali", "SUS Başlangıç Skoru"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — Faz 3 MVP ilk ayı. Kapalı alfa n=20, klinisyen eğitimi ve SUS ilk ölçümü bu ayın üç çıktısı." },
+      { category: "KPI", note: "Alfa n=20 tamamlanmış | SUS ≥75 | Kriz senaryosu 0 kaçırılan vaka | Klinisyen eğitim tamamlama ≥%90" },
+      { category: "Risk", note: "Alfa katılımcı devamsızlığı (orta); kriz simülasyonunda protokol açığı (yüksek) — klinisyen denetimi zorunlu." },
+      { category: "Sorumluluk", note: "Klinik Lider → kriz simülasyonu & onay | Teknik Lider → alfa ortamı | Ürün Sahibi → SUS analizi & öncelik listesi" },
+    ],
   },
   {
     period: "Eylül 2026", subtitle: "10. Dönem", status: "planned", phase: "Faz 3 — MVP",
@@ -264,6 +329,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["MVP Beta v1.1", "T0 Ön-Ölçüm Veri Seti", "Beta Geri Bildirim Raporu", "App Store Başvuruları"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — açık beta n≥50, T0 ön-ölçüm ve App Store başvuruları. Veri toplama zinciri bu ay başlıyor." },
+      { category: "KPI", note: "Beta n≥50 | T0 ölçüm tamamlama ≥%90 | App Store başvurusu gönderilmiş | Bırakma oranı ≤%25" },
+      { category: "Risk", note: "App Store red kararı (orta) — sağlık uygulaması inceleme süreci uzun. Paralel web sürümü hazır tutulmalı." },
+      { category: "Bağımlılık", note: "Alfa açık sorunlar Ağustos'ta kapatılmış olmalı. Klinik güvenlik onayı App Store başvurusuna eklenmeli." },
+    ],
   },
   {
     period: "Ekim 2026", subtitle: "11. Dönem", status: "planned", phase: "Faz 3 — MVP",
@@ -286,6 +357,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["MVP v1.2 (Production)", "Klinik Güvenlik Onay Belgesi", "Pilot Katılım Anlaşmaları", "Etki Ölçüm Protokolü"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — MVP v1.2 production, klinik güvenlik son denetimi ve 2+ pilot anlaşması. Faz 3 kapanış ayı." },
+      { category: "KPI", note: "2+ pilot kurum anlaşması imzalanmış | Klinik güvenlik belgesi tam onaylı | Etki ölçüm protokolü dokümanı tamamlanmış" },
+      { category: "Risk", note: "Pilot kurum çekilme riski (orta) — alternatif kurum listesi hazır tutulmalı. Klinik denetimde blokaj (düşük olasılık, yüksek etki)." },
+      { category: "Bağımlılık", note: "MVP production hazır → klinik onay şart. Geçit: klinik güvenlik belgesi + ≥2 pilot anlaşması → Kasım lansmanı." },
+    ],
   },
   {
     period: "Kasım 2026", subtitle: "12. Dönem", status: "planned", phase: "Faz 4 — Pilot",
@@ -309,6 +386,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["Pilot Kayıt Raporu (Hafta 1)", "T0 Çok Merkezli Ölçüm Verileri", "Pilot İzleme Paneli"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — Faz 4 Pilot lansmanı. ≥200 öğrenci kayıt hedefi; T0 ölçüm zinciri ve 7/24 destek hattı aktive ediliyor." },
+      { category: "KPI", note: "1. hafta kayıt ≥50 | T0 tamamlama ≥%80 | Yüksek risk tepki süresi ≤2 saat | Sistem uptime ≥%99.5" },
+      { category: "Risk", note: "Düşük katılım (orta); altyapı yük sorunu (yüksek) → load test tamamlanmış olmalı; klinisyen iş yükü yönetimi." },
+      { category: "Sorumluluk", note: "Kurum Koordinatörü → kayıt kampanyası | Teknik Lider → uptime & load | Klinik Lider → yüksek risk müdahalesi" },
+    ],
   },
   {
     period: "Aralık 2026", subtitle: "13. Dönem", status: "planned", phase: "Faz 4 — Pilot",
@@ -327,6 +410,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["T1 Ara Ölçüm Raporu", "Klinisyen Deneyim Raporu", "İçerik Revizyon Günlüğü"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — T1 (6. hafta) ara ölçüm ve klinisyen odak grubu. Yılsonu dönemine dikkat: sınav takvimi katılımı düşürebilir." },
+      { category: "KPI", note: "T1 tamamlama ≥%70 | ΔPHQ-9 ara hedef ≥-3 | Klinisyen memnuniyeti ≥%80 | İçerik revizyon günlüğü başlatılmış" },
+      { category: "Risk", note: "Sınav döneminin T1 katılımını düşürmesi (yüksek) — esnek hatırlatma ve uzatılmış pencere uygulanmalı." },
+      { category: "Bağımlılık", note: "Pilot kayıt tamamlanmış & T0 verisi analiz edilebilir durumda olmalı. Klinisyen odak grubu için n=10 müsaatiyeti." },
+    ],
   },
   {
     period: "Ocak 2027", subtitle: "14. Dönem", status: "planned", phase: "Faz 4 — Pilot",
@@ -345,6 +434,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["Pilot Etki Analiz Raporu", "Akademik Makale Taslağı", "TÜBİTAK Ara Raporu", "Triyaj Kalibrasyon Raporu"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — T2 son ölçüm, istatistiksel etki analizi ve TÜBİTAK ara raporu. Faz 4 kapanış ve Faz 5 geçiş ayı." },
+      { category: "KPI", note: "ΔPHQ-9 ≥-4.5 (Cohen's d ≥0.5) | ΔGAD-7 ≥-3.5 | SUS ≥80 | TÜBİTAK ara raporu zamanında teslim" },
+      { category: "Risk", note: "Örneklem n<100 ise istatistiksel güç yetersiz kalabilir (orta) — ek katılımcı rezerv planı Kasım'dan itibaren hazır." },
+      { category: "Bağımlılık", note: "T2 veri toplama tamamlanmış | İstatistik danışman müsait | TÜBİTAK rapor tarihi sabit (kayma yok)." },
+    ],
   },
   {
     period: "Şubat 2027", subtitle: "15. Dönem", status: "planned", phase: "Faz 5 — Kurumsal Entegrasyon",
@@ -363,6 +458,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["Platform v2.0 Öncelik Listesi", "ROI Hesaplama Aracı", "Kurumsal Sunum Paketi"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — Faz 5 ilk ayı. Pilot bulguları v2.0'a aktarılıyor; kurumsal satış hazırlığı ve ROI aracı bu ayın odağı." },
+      { category: "KPI", note: "Platform v2.0 öncelik listesi onaylı | ROI aracı 3 senaryo ile test edilmiş | Kurumsal sunum paketi hazır" },
+      { category: "Risk", note: "Pilot bulgularının B2B fiyatlamayı desteklememesi (düşük ama kritik) — düzeltici mesajlaşma ve vaka çalışmaları hazır." },
+      { category: "Sorumluluk", note: "Ürün Sahibi → v2.0 öncelik | Klinik Lider → vaka çalışmaları | Ticari Lider → ROI aracı & fiyat modeli" },
+    ],
   },
   {
     period: "Mart 2027", subtitle: "16. Dönem", status: "planned", phase: "Faz 5 — Kurumsal Entegrasyon",
@@ -381,6 +482,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["Kamu Kurumu Toplantı Tutanakları", "ISO 27001 Başvurusu"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — Sağlık Bakanlığı / YÖK resmi görüşmeleri ve ISO 27001 denetim başvurusu bu ayın iki kritik aksiyonu." },
+      { category: "KPI", note: "≥1 resmi kamu kurumu toplantı tutanağı | ISO 27001 başvurusu gönderilmiş | USVS/SKRS onay süreci başlatılmış" },
+      { category: "Risk", note: "Kamu kurumu süreç gecikmesi (yüksek) — ISO denetim tarihi ve Bakanlık randevusu paralel takip edilmeli." },
+      { category: "Bağımlılık", note: "TÜBİTAK ara raporu teslim edilmiş | Pilot etki raporu Bakanlık sunum materyali olarak hazır." },
+    ],
   },
   {
     period: "Nisan 2027", subtitle: "17. Dönem", status: "planned", phase: "Faz 5 — Kurumsal Entegrasyon",
@@ -399,6 +506,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["3 Patent Başvurusu (TPE)", "PCT Strateji Raporu", "IP Portföy Envanteri"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — 3 patent TPE'ye teslim edilecek ve PCT fizibilite sonuçlandırılacak. IP portföyünün en yoğun ayı." },
+      { category: "KPI", note: "3 patent başvurusu teslim edilmiş | PCT fizibilite sonuçlandırılmış | IP portföy envanteri güncel ve arşivlenmiş" },
+      { category: "Risk", note: "Patent reddi veya öncelik hakkı itirazı (orta) — vekil patent avukatı görevlendirilmiş ve teknik açıklamalar onaylı olmalı." },
+      { category: "Sorumluluk", note: "Klinik Lider → teknik açıklamalar | Patent Avukatı → başvuru & prosedür | Ürün Sahibi → IP stratejisi & PCT karar" },
+    ],
   },
   {
     period: "Mayıs 2027", subtitle: "18. Dönem", status: "planned", phase: "Faz 5 — Kurumsal Entegrasyon",
@@ -416,6 +529,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["İlk Ticari Sözleşmeler (≥3)", "ISO 27001 Sertifikası", "Yayımlanan Akademik Makale"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — ≥3 kurumsal sözleşme, ISO 27001 sertifikası ve akademik yayın. Faz 5 kapanış ve en büyük ticari milestone." },
+      { category: "KPI", note: "≥3 üniversite B2B sözleşmesi imzalanmış | ISO 27001 sertifikası alınmış | Akademik makale yayımlanmış veya kabul almış" },
+      { category: "Risk", note: "Sözleşme müzakere gecikmesi (orta); ISO denetim kritik bulgusu (düşük ama yüksek etki). Her ikisi paralel takip." },
+      { category: "Bağımlılık", note: "Platform v2.0 production hazır | ISO ön denetim sorunsuz | Klinik makale hakem sürecinde veya tamamlanmış." },
+    ],
   },
   {
     period: "Haziran 2027", subtitle: "19. Dönem", status: "planned", phase: "Faz 6 — İhracat & Ölçek",
@@ -434,6 +553,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["Çok Dilli Platform (EN/AR/DE)", "Ülke Bazlı Kriz Kaynak Rehberi", "Kültürel Uyarlama Raporu"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — Faz 6 ilk ayı. EN/AR/DE çevirisi ve kültürel klinik uyarlama tamamlanacak. RTL arayüz test edilecek." },
+      { category: "KPI", note: "3 dil içerik çevirisi tamamlanmış | Arapça RTL test geçti | Kültürel danışman onayı (3 bölge) | Kriz kaynakları güncel" },
+      { category: "Risk", note: "Arapça RTL layout sorunları (orta); yerel kriz kaynakları eksik kalabilir (orta) — ülke bazlı güncelleme şart." },
+      { category: "Sorumluluk", note: "Teknik Lider → i18n altyapı & RTL | Klinik Lider → kültürel uyarlama | Çeviri Koordinatörü → içerik & norm" },
+    ],
   },
   {
     period: "Temmuz 2027", subtitle: "20. Dönem", status: "planned", phase: "Faz 6 — İhracat & Ölçek",
@@ -452,6 +577,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["Pazar Giriş Stratejisi (3 Bölge)", "Ortaklık Mutabakat Mektupları"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — MENA, Türkî Cumhuriyetler ve AB pazar araştırması ile ortaklık mutabakat mektupları bu ayın çıktısı." },
+      { category: "KPI", note: "3 bölge pazar analizi tamamlanmış | ≥2 ortaklık mutabakat mektubu | Hukuki çerçeve ≥2 ülke için hazır" },
+      { category: "Risk", note: "Hedef ülke düzenleyici farklılıkları (yüksek) — yerel hukuk danışmanı her bölge için görevlendirilmiş olmalı." },
+      { category: "Bağımlılık", note: "Çok dilli platform (EN/AR/DE) Haziran'da hazır ve test edilmiş olmalı. Ortaklık için referans materyali mevcut." },
+    ],
   },
   {
     period: "Ağustos 2027", subtitle: "21. Dönem", status: "planned", phase: "Faz 6 — İhracat & Ölçek",
@@ -469,6 +600,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["SaMD Boşluk Analizi", "Düzenleyici Strateji Belgesi", "Uluslararası Pilot Anlaşması"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — SaMD go/no-go kararı ve ≥1 uluslararası pilot anlaşması bu ayın iki kritik milestone'u." },
+      { category: "KPI", note: "SaMD go/no-go kararı alınmış | ≥1 uluslararası pilot anlaşması imzalanmış | Boşluk analizi belgelenmiş" },
+      { category: "Risk", note: "SaMD yolunun seçilmesi halinde 12–24 ay ek zaman ve ciddi bütçe gerekebilir (yüksek etki) — karar öncesi senaryo analizi şart." },
+      { category: "Bağımlılık", note: "ISO 27001 sertifikası alınmış | Düzenleyici danışman raporu hazır | Uluslararası pilot kurum resmi onay vermiş." },
+    ],
   },
   {
     period: "Eylül 2027", subtitle: "22. Dönem", status: "planned", phase: "Faz 6 — İhracat & Ölçek",
@@ -487,6 +624,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["Platform v2.0", "Uluslararası T0 Veri Seti", "İşveren Modülü Beta"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — uluslararası pilot canlı; platform v2.0 ve işveren modülü beta lansmanı. Çok bölgeli operasyon başlıyor." },
+      { category: "KPI", note: "Uluslararası T0 tamamlama ≥%80 | Triyaj v2 kalibrasyon onaylı | İşveren modülü beta ≥10 test kullanıcısı" },
+      { category: "Risk", note: "Uluslararası veri koruma (GDPR/PDPL) uyumsuzluk riski (yüksek); çok kiracılı altyapı yük yönetimi." },
+      { category: "Bağımlılık", note: "Çok dilli içerik hazır; uluslararası kurum koordinatörü atanmış; yerel barındırma ve hukuki onay tamamlanmış." },
+    ],
   },
   {
     period: "Ekim 2027", subtitle: "23. Dönem", status: "planned", phase: "Faz 6 — İhracat & Ölçek",
@@ -505,6 +648,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["Uluslararası İlk Sözleşme", "Sosyal Etki Raporu", "Platform Erişim Büyüme Raporu"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — ilk uluslararası kurumsal sözleşme ve Türkiye'de ≥1000 aktif kullanıcı hedefi. Proje zirvesi ayı." },
+      { category: "KPI", note: "İlk uluslararası sözleşme imzalanmış | Türkiye aktif kullanıcı ≥1000 | Sosyal etki raporu teslim edilmiş" },
+      { category: "Risk", note: "Uluslararası müşteri onboarding karmaşıklığı (orta); farklı zaman dilimleri ve dil desteği yönetimi." },
+      { category: "Sorumluluk", note: "Ürün Sahibi → uluslararası sözleşme | Teknik Lider → çok kiracılı altyapı | Klinik Lider → sosyal etki raporu" },
+    ],
   },
   {
     period: "Kasım 2027", subtitle: "24. Dönem", status: "planned", phase: "Faz 6 — İhracat & Ölçek",
@@ -527,6 +676,12 @@ const timelineData: TimelineEntry[] = [
     ],
     pending: [],
     outputs: ["TÜBİTAK Final Raporu", "Sosyal Etki Belgesi", "2028–2030 Yol Haritası", "Yatırım Paketi", "IP Portföyü (Tam)"],
+    upgradeNotes: [
+      { category: "Durum Notu", note: "Planlandı — proje kapanış ayı. TÜBİTAK final raporu, 2028-2030 yol haritası ve yatırım paketi bu ayın üç final çıktısı." },
+      { category: "KPI", note: "TÜBİTAK final raporu onaylı | Tüm IP portföyü arşivlenmiş | 2028-2030 yol haritası onaylı | Sosyal etki belgesi teslim" },
+      { category: "Risk", note: "Proje çıktılarının hedeften sapma riski (orta) — erken ara değerlendirmelerle minimize edildi. Final rapor zamanlaması kritik." },
+      { category: "Sorumluluk", note: "Proje Yöneticisi → TÜBİTAK raporu | Klinik Lider → etki belgesi | Ürün Sahibi → yatırım paketi & 2028-2030 yol haritası" },
+    ],
   },
 ];
 
@@ -539,16 +694,6 @@ const statusLabel = (s: TimelineEntry["status"]) =>
   s === "completed" ? "Tamamlandı" : s === "ongoing" ? "Devam Ediyor" : "Planlandı";
 
 const TODAY_STAMP = "03.03.2026";
-
-const contentUpgradeItems = [
-  "03.03.2026 durum özeti eklendi: Aralık 2025 tamamlandı, Ocak 2026 devam ediyor, Şubat 2026 planlandı, Mart 2026 planlandı.",
-  "Durum güncelleme standardı tanımlandı: her ay kapanışında dönem statüsü (completed/ongoing/planned) revize edilecek.",
-  "KPI zorunluluğu tanımlandı: her dönem en az 1 klinik etki, 1 operasyon ve 1 deneyim metriği ile takip edilecek.",
-  "Risk günlüğü standardı eklendi: her dönem için en az 3 risk, aksiyon planı ve sorumlu kişi yazılacak.",
-  "Bağımlılık kapıları netleştirildi: Etik kurul onayı, USVS/SKRS/FHIR erişimi ve ISO süreçleri kritik geçit olarak izlenecek.",
-  "Sorumluluk matrisi şablonu eklendi: Klinik Lider, Ürün Sahibi, Teknik Lider ve Kurum Koordinatörü bazında sahiplik atanacak.",
-  "Kanıt bağlantısı standardı eklendi: dönem çıktıları belge sürümü ve tarih bilgisiyle doğrulanacak.",
-];
 
 function NewStamp() {
   return (
@@ -718,21 +863,34 @@ export default function Home() {
             <p className="text-gray-500">{entry.summary}</p>
           </div>
 
-          <section className="mb-5 rounded-xl border border-sky-200 bg-sky-50/80 overflow-hidden">
-            <div className="px-4 py-3 border-b border-sky-200 bg-sky-100/70 flex items-center justify-between gap-2">
-              <h3 className="text-sm font-semibold text-sky-900">İçerik Güçlendirme Notları</h3>
-              <NewStamp />
-            </div>
-            <ul className="divide-y divide-sky-100">
-              {contentUpgradeItems.map((item) => (
-                <li key={item} className="px-4 py-3 text-sm text-sky-900 flex flex-wrap items-start justify-between gap-2">
-                  <span>{item}</span>
-                  <NewStamp />
-                </li>
-              ))}
-            </ul>
-          </section>
+          {/* ── DÖNEM NOTLARI (aya özgü) ── */}
+          {entry.upgradeNotes.length > 0 && (
+            <section className="mb-5 rounded-xl border border-slate-200 bg-white overflow-hidden">
+              <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between gap-2">
+                <h3 className="text-sm font-semibold text-slate-700">Dönem Notları — {entry.period}</h3>
+                <NewStamp />
+              </div>
+              <ul className="divide-y divide-slate-100">
+                {entry.upgradeNotes.map((note, i) => {
+                  const cs = upgradeCategoryStyle[note.category] ?? {
+                    bg: "bg-gray-50", text: "text-gray-700", border: "border-gray-200", dot: "bg-gray-400",
+                  };
+                  return (
+                    <li key={i} className="px-4 py-3 flex flex-wrap items-start gap-3">
+                      <span className={`shrink-0 mt-0.5 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${cs.bg} ${cs.text} border ${cs.border}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${cs.dot}`} />
+                        {note.category}
+                      </span>
+                      <span className="flex-1 text-sm text-slate-700">{note.note}</span>
+                      <NewStamp />
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
 
+          {/* ── Acil güvenlik notu ── */}
           <section className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
             <p className="text-sm text-red-800 flex flex-wrap items-start justify-between gap-2">
               <span>
