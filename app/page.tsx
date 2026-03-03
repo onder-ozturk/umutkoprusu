@@ -541,10 +541,10 @@ export default function Home() {
   const style = phaseStyle[entry.phase];
 
   return (
-    <div className="flex min-h-screen bg-gray-50 font-sans">
+    <div className="flex h-screen bg-gray-50 font-sans overflow-hidden">
 
       {/* ── SIDEBAR ── full height */}
-      <aside className="w-64 shrink-0 bg-white border-r border-gray-200 flex flex-col">
+      <aside className="w-64 shrink-0 bg-white border-r border-gray-200 flex flex-col h-full">
         {/* Sidebar top brand */}
         <div className="px-4 py-4 border-b border-gray-200 shrink-0">
           <p className="text-xs font-bold text-blue-600 uppercase tracking-wide">AffectLog-TR</p>
@@ -593,7 +593,7 @@ export default function Home() {
       </aside>
 
       {/* ── RIGHT SIDE: header + content + footer ── */}
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex flex-col flex-1 min-w-0 h-full overflow-hidden">
 
         {/* ── TOP HEADER ── */}
         <header className="bg-white border-b border-gray-200 shrink-0">
