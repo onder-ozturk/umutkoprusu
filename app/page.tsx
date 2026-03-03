@@ -750,27 +750,30 @@ export default function Home() {
   const [selected, setSelected] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeDetail, setActiveDetail] = useState<ItemDetail | null>(null);
-  const [openSections, setOpenSections] = useState<Record<number, boolean>>({});
+  const [activeSection, setActiveSection] = useState<Section | null>(null);
   const entry = timelineData[selected];
   const style = phaseStyle[entry.phase];
 
   const openDetail = (detail: ItemDetail) => {
-    setOpenSections({});
+    setActiveSection(null);
     setActiveDetail(detail);
   };
   const closeDetail = () => {
-    setOpenSections({});
+    setActiveSection(null);
     setActiveDetail(null);
   };
 
   useEffect(() => {
     if (!activeDetail) return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeDetail();
+      if (event.key === "Escape") {
+        if (activeSection) setActiveSection(null);
+        else closeDetail();
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [activeDetail]);
+  }, [activeDetail, activeSection]);
 
   const handleMonthSelect = (idx: number) => {
     setSelected(idx);
@@ -1154,11 +1157,12 @@ export default function Home() {
                       for (const { word, si } of triggers) {
                         const pos = point.indexOf(word, cursor);
                         if (pos > cursor) nodes.push(point.slice(cursor, pos));
+                        const sec = activeDetail.sections![si];
                         nodes.push(
                           <button
                             key={`trg-${si}`}
                             type="button"
-                            onClick={() => setOpenSections(s => ({ ...s, [si]: !s[si] }))}
+                            onClick={() => setActiveSection(sec)}
                             className="font-semibold text-sky-700 underline decoration-dashed underline-offset-2 hover:text-sky-900 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-sky-400 rounded"
                           >
                             {word}
@@ -1186,138 +1190,6 @@ export default function Home() {
                 </ul>
               )}
 
-              {/* Expandable test sections (PHQ-9 / GAD-7) — per-section toggle */}
-              {activeDetail.sections && activeDetail.sections.map((sec, si) => {
-                if (!openSections[si]) return null;
-
-                const closeBtn = (
-                  <button
-                    type="button"
-                    onClick={() => setOpenSections(s => ({ ...s, [si]: false }))}
-                    className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full text-white/70 hover:text-white hover:bg-white/20 transition-colors focus:outline-none"
-                    aria-label="Kapat"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                );
-
-                if (sec.format === "questionnaire") {
-                  const cols = [
-                    { label: "Tam olarak değil", score: "0" },
-                    { label: "Birkaç gün", score: "+1" },
-                    { label: "Günlerin yarısından fazlası", score: "+2" },
-                    { label: "Neredeyse her gün", score: "+3" },
-                  ];
-                  return (
-                    <div key={si} className="rounded-xl border border-slate-200 overflow-hidden">
-                      {/* Title bar */}
-                      <div className="flex items-center justify-between gap-2 px-3 py-2.5 bg-sky-700 text-white">
-                        <h5 className="text-xs font-bold">{sec.title}</h5>
-                        {closeBtn}
-                      </div>
-                      {/* Subtitle */}
-                      <div className="px-3 py-2 bg-white border-b border-slate-200">
-                        <p className="text-[11px] text-slate-600 leading-snug">{sec.description}</p>
-                      </div>
-                      {/* Question table */}
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr className="border-b border-slate-300 bg-slate-50">
-                            <th className="text-left px-3 py-2 text-[10px] font-medium text-slate-700 border-r border-slate-200">
-                              <span className="font-bold underline">Son 2 hafta</span> içinde aşağıdaki sorunlar sizi ne sıklıkla rahatsız etti?
-                            </th>
-                            {cols.map((col, ci) => (
-                              <th key={ci} className="px-1 py-2 text-center border-r border-slate-200 last:border-r-0 w-[13%]">
-                                <span className="block text-[9px] font-medium text-slate-600 leading-tight">{col.label}</span>
-                                <span className="block text-[10px] font-bold text-slate-800 mt-0.5">{col.score}</span>
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {sec.items.map((q, qi) => (
-                            <tr key={qi} className={`border-b border-slate-100 ${qi % 2 === 0 ? "bg-white" : "bg-slate-50/60"}`}>
-                              <td className="px-3 py-2 text-[10px] text-slate-700 leading-relaxed border-r border-slate-200 align-top">
-                                <span className="font-semibold">{qi + 1}.</span> {q}
-                              </td>
-                              {[0, 1, 2, 3].map(c => (
-                                <td key={c} className="px-1 py-2 text-center border-r border-slate-100 last:border-r-0 align-middle">
-                                  <span className="inline-block w-4 h-4 rounded-full border-2 border-slate-400 bg-white" />
-                                </td>
-                              ))}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      {/* Scoring footer */}
-                      <div className="px-3 py-2 bg-slate-50 border-t border-slate-200">
-                        <p className="text-[10px] text-slate-600">{sec.scoring}</p>
-                      </div>
-                      {/* Interpretation table */}
-                      {sec.scoringTable && sec.scoringTable.length > 0 && (
-                        <div className="border-t border-slate-200">
-                          <div className="px-3 py-1.5 bg-slate-50 border-b border-slate-200">
-                            <p className="text-[10px] font-semibold text-slate-700">Yorum:</p>
-                          </div>
-                          <table className="w-full border-collapse">
-                            <thead>
-                              <tr className="bg-slate-700 text-white">
-                                <th className="px-2 py-1.5 text-left text-[9px] font-semibold border-r border-slate-600 w-[18%]">PHQ-9 Puanı</th>
-                                <th className="px-2 py-1.5 text-left text-[9px] font-semibold border-r border-slate-600 w-[22%]">Depresyon Şiddeti</th>
-                                <th className="px-2 py-1.5 text-left text-[9px] font-semibold">Önerilen Eylem</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {sec.scoringTable.map((row, ri) => (
-                                <tr key={ri} className={`border-b border-slate-100 ${ri % 2 === 0 ? "bg-white" : "bg-slate-50"}`}>
-                                  <td className="px-2 py-1.5 text-[9px] text-slate-700 border-r border-slate-200">{row.score}</td>
-                                  <td className="px-2 py-1.5 text-[9px] text-slate-700 border-r border-slate-200">{row.severity}</td>
-                                  <td className="px-2 py-1.5 text-[9px] text-slate-600 leading-relaxed">{row.action}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-                      {/* Notes */}
-                      {sec.notes && sec.notes.length > 0 && (
-                        <div className="px-3 py-2 bg-blue-50 border-t border-blue-100">
-                          <ul className="space-y-1">
-                            {sec.notes.map((note, ni) => (
-                              <li key={ni} className="text-[10px] text-blue-800 leading-relaxed">• {note}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-
-                /* Default list rendering (GAD-7 ve diğerleri) */
-                return (
-                  <div key={si} className="rounded-xl border border-indigo-100 bg-indigo-50/50 overflow-hidden">
-                    <div className="px-4 py-2.5 bg-indigo-600 border-b border-indigo-100 flex items-start justify-between gap-2">
-                      <div>
-                        <h5 className="text-xs font-bold text-white">{sec.title}</h5>
-                        <p className="text-[11px] text-indigo-200 mt-0.5 leading-snug">{sec.description}</p>
-                      </div>
-                      {closeBtn}
-                    </div>
-                    <ol className="px-4 py-3 space-y-1.5">
-                      {sec.items.map((q, qi) => (
-                        <li key={qi} className="text-xs text-slate-700 leading-relaxed">{q}</li>
-                      ))}
-                    </ol>
-                    <div className="px-4 py-2 bg-indigo-50 border-t border-indigo-100">
-                      <p className="text-[11px] font-semibold text-indigo-700">
-                        <span className="mr-1 text-indigo-400">Puanlama:</span>{sec.scoring}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
 
               {/* Tags */}
               {activeDetail.tags.length > 0 && (
@@ -1331,6 +1203,140 @@ export default function Home() {
                       {tag}
                     </span>
                   ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 2. Popup: Ölçek detay (PHQ-9 / GAD-7) ───────────────── */}
+      {activeSection && (
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-6">
+          {/* Backdrop — sadece 2. popup'ı kapatır */}
+          <button
+            type="button"
+            className="detail-backdrop absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] cursor-default"
+            onClick={() => setActiveSection(null)}
+            aria-label="Kapat"
+          />
+
+          {/* Kart */}
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={activeSection.title}
+            className="detail-popup relative z-10 w-full sm:max-w-2xl rounded-t-2xl sm:rounded-2xl bg-white shadow-[0_32px_72px_-8px_rgba(0,0,0,0.32),0_0_0_1px_rgba(0,0,0,0.07)] overflow-hidden"
+          >
+            {/* Title bar */}
+            <div className="flex items-center justify-between gap-3 px-4 py-3 bg-sky-700 text-white">
+              <h4 className="text-sm font-bold leading-snug">{activeSection.title}</h4>
+              <button
+                type="button"
+                onClick={() => setActiveSection(null)}
+                className="shrink-0 flex items-center justify-center w-7 h-7 rounded-full text-white/70 hover:text-white hover:bg-white/20 transition-colors focus:outline-none"
+                aria-label="Kapat"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Scrollable body */}
+            <div className="max-h-[75vh] overflow-y-auto">
+              {/* Subtitle */}
+              <div className="px-4 py-2.5 bg-white border-b border-slate-200">
+                <p className="text-[11px] text-slate-600 leading-snug">{activeSection.description}</p>
+              </div>
+
+              {activeSection.format === "questionnaire" ? (
+                <>
+                  {/* Soru tablosu */}
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-300 bg-slate-50">
+                        <th className="text-left px-4 py-2.5 text-[10px] font-medium text-slate-700 border-r border-slate-200">
+                          <span className="font-bold underline">Son 2 hafta</span> içinde aşağıdaki sorunlar sizi ne sıklıkla rahatsız etti?
+                        </th>
+                        {[
+                          { label: "Tam olarak değil", score: "0" },
+                          { label: "Birkaç gün", score: "+1" },
+                          { label: "Günlerin yarısından fazlası", score: "+2" },
+                          { label: "Neredeyse her gün", score: "+3" },
+                        ].map((col, ci) => (
+                          <th key={ci} className="px-2 py-2.5 text-center border-r border-slate-200 last:border-r-0 w-[14%]">
+                            <span className="block text-[9px] font-medium text-slate-600 leading-tight">{col.label}</span>
+                            <span className="block text-[11px] font-bold text-slate-800 mt-0.5">{col.score}</span>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activeSection.items.map((q, qi) => (
+                        <tr key={qi} className={`border-b border-slate-100 ${qi % 2 === 0 ? "bg-white" : "bg-slate-50/60"}`}>
+                          <td className="px-4 py-2.5 text-[11px] text-slate-700 leading-relaxed border-r border-slate-200 align-top">
+                            <span className="font-semibold">{qi + 1}.</span> {q}
+                          </td>
+                          {[0, 1, 2, 3].map(c => (
+                            <td key={c} className="px-2 py-2.5 text-center border-r border-slate-100 last:border-r-0 align-middle">
+                              <span className="inline-block w-4 h-4 rounded-full border-2 border-slate-400 bg-white" />
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  {/* Toplam puan notu */}
+                  <div className="px-4 py-2.5 bg-slate-50 border-t border-slate-200">
+                    <p className="text-[11px] text-slate-600">{activeSection.scoring}</p>
+                  </div>
+
+                  {/* Yorum tablosu */}
+                  {activeSection.scoringTable && activeSection.scoringTable.length > 0 && (
+                    <div className="border-t border-slate-200">
+                      <div className="px-4 py-2 bg-slate-50 border-b border-slate-200">
+                        <p className="text-[11px] font-semibold text-slate-700">Yorum:</p>
+                      </div>
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-slate-700 text-white">
+                            <th className="px-3 py-2 text-left text-[10px] font-semibold border-r border-slate-600 w-[18%]">Puan</th>
+                            <th className="px-3 py-2 text-left text-[10px] font-semibold border-r border-slate-600 w-[24%]">Şiddet</th>
+                            <th className="px-3 py-2 text-left text-[10px] font-semibold">Önerilen Eylem</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {activeSection.scoringTable.map((row, ri) => (
+                            <tr key={ri} className={`border-b border-slate-100 ${ri % 2 === 0 ? "bg-white" : "bg-slate-50"}`}>
+                              <td className="px-3 py-2 text-[10px] text-slate-700 border-r border-slate-200">{row.score}</td>
+                              <td className="px-3 py-2 text-[10px] text-slate-700 border-r border-slate-200">{row.severity}</td>
+                              <td className="px-3 py-2 text-[10px] text-slate-600 leading-relaxed">{row.action}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </>
+              ) : (
+                /* Listeli format */
+                <ol className="px-4 py-3 space-y-1.5">
+                  {activeSection.items.map((q, qi) => (
+                    <li key={qi} className="text-xs text-slate-700 leading-relaxed">{q}</li>
+                  ))}
+                </ol>
+              )}
+
+              {/* Notlar */}
+              {activeSection.notes && activeSection.notes.length > 0 && (
+                <div className="px-4 py-3 bg-blue-50 border-t border-blue-100">
+                  <ul className="space-y-1.5">
+                    {activeSection.notes.map((note, ni) => (
+                      <li key={ni} className="text-[11px] text-blue-800 leading-relaxed">• {note}</li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </div>
