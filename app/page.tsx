@@ -754,13 +754,19 @@ export default function Home() {
   const entry = timelineData[selected];
   const style = phaseStyle[entry.phase];
 
-  useEffect(() => {
+  const openDetail = (detail: ItemDetail) => {
     setShowSections(false);
+    setActiveDetail(detail);
+  };
+  const closeDetail = () => {
+    setShowSections(false);
+    setActiveDetail(null);
+  };
+
+  useEffect(() => {
     if (!activeDetail) return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setActiveDetail(null);
-      }
+      if (event.key === "Escape") closeDetail();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -769,7 +775,7 @@ export default function Home() {
   const handleMonthSelect = (idx: number) => {
     setSelected(idx);
     setSidebarOpen(false);
-    setActiveDetail(null);
+    closeDetail();
   };
 
   return (
@@ -983,7 +989,7 @@ export default function Home() {
                             <span>{item}</span>
                             <button
                               type="button"
-                              onClick={() => setActiveDetail(getItemDetail(entry.period, cat.category, item))}
+                              onClick={() => openDetail(getItemDetail(entry.period, cat.category, item))}
                               className="cursor-pointer inline-flex h-5 w-5 items-center justify-center rounded-full border border-sky-300 bg-sky-50 text-[11px] font-bold text-sky-700 hover:bg-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                               aria-label={`Detayı aç: ${item}`}
                               title="Detayı gör"
@@ -1040,7 +1046,7 @@ export default function Home() {
                 {selected > 0 && (
                   <button onClick={() => {
                     setSelected(selected - 1);
-                    setActiveDetail(null);
+                    closeDetail();
                   }}
                     className="flex-1 py-2 px-3 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                     ← {timelineData[selected - 1].period}
@@ -1049,7 +1055,7 @@ export default function Home() {
                 {selected < timelineData.length - 1 && (
                   <button onClick={() => {
                     setSelected(selected + 1);
-                    setActiveDetail(null);
+                    closeDetail();
                   }}
                     className="flex-1 py-2 px-3 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                     {timelineData[selected + 1].period} →
@@ -1083,7 +1089,7 @@ export default function Home() {
           <button
             type="button"
             className="detail-backdrop absolute inset-0 bg-slate-900/60 backdrop-blur-sm cursor-default"
-            onClick={() => setActiveDetail(null)}
+            onClick={() => closeDetail()}
             aria-label="Kapat"
           />
 
@@ -1113,7 +1119,7 @@ export default function Home() {
               </div>
               <button
                 type="button"
-                onClick={() => setActiveDetail(null)}
+                onClick={() => closeDetail()}
                 className="shrink-0 mt-0.5 flex items-center justify-center w-8 h-8 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                 aria-label="Kapat"
               >
