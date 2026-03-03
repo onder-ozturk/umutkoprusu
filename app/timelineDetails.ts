@@ -187,10 +187,18 @@ export const timelineDetails: Record<string, string[]> = {
    Zenginleştirilmiş popup verileri  (lead · points · tags)
    Şu an yalnızca Aralık 2025 — 12 madde tanımlı.
    ───────────────────────────────────────────────────────────────── */
+export type Section = {
+  title: string;
+  description: string;
+  items: string[];
+  scoring: string;
+};
+
 export type RichDetail = {
   lead: string;
   points: string[];
   tags: string[];
+  sections?: Section[];
 };
 
 export const timelineDetailsRich: Record<string, RichDetail> = {
@@ -207,6 +215,38 @@ export const timelineDetailsRich: Record<string, RichDetail> = {
       "Yüksek skor alan her kullanıcı için otomatik klinik görüşme daveti oluşturulur; yalnızca skora bakılarak otomatik tanı veya etiket atanmaz.",
     ],
     tags: ["PHQ-9", "GAD-7", "C-SSRS/ASQ", "Klinik Protokol", "Tarama İlkeleri"],
+    sections: [
+      {
+        title: "PHQ-9 — Depresyon Tarama Ölçeği",
+        description: "Son 2 haftada aşağıdaki sorunlardan ne sıklıkla rahatsız oldunuz? (0 = Hiç · 1 = Birkaç gün · 2 = Yarısından fazla gün · 3 = Neredeyse her gün)",
+        items: [
+          "1. Az ilgi ya da zevk alma",
+          "2. Kendini kötü, depresif ya da umutsuz hissetme",
+          "3. Uyku güçlükleri: uykuya dalmakta güçlük, gece uyanma ya da çok fazla uyuma",
+          "4. Yorgunluk ya da enerji azlığı hissetme",
+          "5. İştah azlığı ya da fazlalığı",
+          "6. Kendini başarısız hissetme ya da aileyi hayal kırıklığına uğratma",
+          "7. Gazete okuma, TV izleme gibi şeylere konsantre olmakta güçlük",
+          "8. Yavaş hareket/konuşma ya da tam tersine aşırı huzursuzluk ve gerginlik",
+          "9. Kendine zarar verme ya da \"daha iyi olsaydım ölseydim\" düşünceleri",
+        ],
+        scoring: "0–4: Minimal · 5–9: Hafif · 10–14: Orta · 15–19: Orta-şiddetli · 20–27: Şiddetli",
+      },
+      {
+        title: "GAD-7 — Yaygın Anksiyete Ölçeği",
+        description: "Son 2 haftada aşağıdaki sorunlardan ne sıklıkla rahatsız oldunuz? (0 = Hiç · 1 = Birkaç gün · 2 = Yarısından fazla gün · 3 = Neredeyse her gün)",
+        items: [
+          "1. Sinirli, endişeli ya da gergin hissetme",
+          "2. Kaygıyı durduramama ya da kontrol edememe",
+          "3. Farklı konularda aşırı endişelenme",
+          "4. Rahatlamakta güçlük çekme",
+          "5. O kadar huzursuz olma ki yerinde duramama",
+          "6. Kolayca sinirlenme ya da tahriş olma",
+          "7. Kötü bir şey olacakmış gibi korku duyma",
+        ],
+        scoring: "0–4: Minimal · 5–9: Hafif · 10–14: Orta · ≥15: Şiddetli",
+      },
+    ],
   },
 
   "Risk eşik değerleri ve uyarı akışları klinisyen danışmanlarla birlikte taslaklandı": {

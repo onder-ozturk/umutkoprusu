@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { timelineDetails, timelineDetailsRich } from "./timelineDetails";
+import { timelineDetails, timelineDetailsRich, type Section } from "./timelineDetails";
 
 type UpgradeNote = { category: string; note: string };
 type ItemDetail = {
@@ -11,6 +11,7 @@ type ItemDetail = {
   lead: string;
   points: string[];
   tags: string[];
+  sections?: Section[];
 };
 
 type TimelineEntry = {
@@ -719,7 +720,7 @@ function getItemDetail(period: string, category: string, item: string): ItemDeta
   // 1) Önce zengin format
   if (timelineDetailsRich[item]) {
     const r = timelineDetailsRich[item];
-    return { ...base, lead: r.lead, points: r.points, tags: r.tags };
+    return { ...base, lead: r.lead, points: r.points, tags: r.tags, sections: r.sections };
   }
 
   // 2) Eski string[] formatından dönüştür
@@ -749,10 +750,12 @@ export default function Home() {
   const [selected, setSelected] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeDetail, setActiveDetail] = useState<ItemDetail | null>(null);
+  const [showSections, setShowSections] = useState(false);
   const entry = timelineData[selected];
   const style = phaseStyle[entry.phase];
 
   useEffect(() => {
+    setShowSections(false);
     if (!activeDetail) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -1130,17 +1133,60 @@ export default function Home() {
               {/* Points */}
               {activeDetail.points.length > 0 && (
                 <ul className="space-y-2.5">
-                  {activeDetail.points.map((point, i) => (
-                    <li key={i} className="flex gap-3 text-sm text-slate-700 leading-relaxed">
-                      <span className="mt-0.5 shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-sky-100">
-                        <svg className="w-3 h-3 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </span>
-                      <span>{point}</span>
-                    </li>
-                  ))}
+                  {activeDetail.points.map((point, i) => {
+                    const isExpandable = i === 0 && !!activeDetail.sections?.length;
+                    return (
+                      <li key={i} className="flex gap-3 text-sm leading-relaxed">
+                        <span className="mt-0.5 shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-sky-100">
+                          <svg className="w-3 h-3 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </span>
+                        {isExpandable ? (
+                          <button
+                            type="button"
+                            onClick={() => setShowSections(v => !v)}
+                            className="flex-1 text-left text-sky-700 font-medium underline decoration-dashed underline-offset-2 hover:text-sky-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 rounded cursor-pointer flex items-center gap-1.5"
+                          >
+                            <span>{point}</span>
+                            <svg
+                              className={`w-3.5 h-3.5 shrink-0 transition-transform ${showSections ? "rotate-180" : ""}`}
+                              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                        ) : (
+                          <span className="text-slate-700">{point}</span>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
+              )}
+
+              {/* Expanded test sections (PHQ-9 / GAD-7) */}
+              {showSections && activeDetail.sections && activeDetail.sections.length > 0 && (
+                <div className="space-y-4">
+                  {activeDetail.sections.map((sec, si) => (
+                    <div key={si} className="rounded-xl border border-indigo-100 bg-indigo-50/50 overflow-hidden">
+                      <div className="px-4 py-2.5 bg-indigo-100/70 border-b border-indigo-100">
+                        <h5 className="text-xs font-bold text-indigo-800 uppercase tracking-wider">{sec.title}</h5>
+                        <p className="text-[11px] text-indigo-600 mt-0.5 leading-snug">{sec.description}</p>
+                      </div>
+                      <ol className="px-4 py-3 space-y-1.5">
+                        {sec.items.map((q, qi) => (
+                          <li key={qi} className="text-xs text-slate-700 leading-relaxed">{q}</li>
+                        ))}
+                      </ol>
+                      <div className="px-4 py-2 bg-indigo-100/50 border-t border-indigo-100">
+                        <p className="text-[11px] font-semibold text-indigo-700">
+                          <span className="mr-1 text-indigo-400">Puanlama:</span>{sec.scoring}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               )}
 
               {/* Tags */}
