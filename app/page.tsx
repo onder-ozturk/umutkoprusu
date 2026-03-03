@@ -1,7 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { timelineDetails } from "./timelineDetails";
 
 type UpgradeNote = { category: string; note: string };
+type ItemDetail = { title: string; body: string };
 
 type TimelineEntry = {
   period: string;
@@ -703,15 +705,49 @@ function NewStamp() {
   );
 }
 
+function getItemDetail(period: string, category: string, item: string): ItemDetail {
+  const title = `${period} • ${category}`;
+
+  if (timelineDetails[item]) {
+    return {
+      title,
+      body: timelineDetails[item].join("\n"),
+    };
+  }
+
+  // Fallback (for items not found in timelineDetails map)
+  return {
+    title,
+    body: [
+      "Faaliyet: " + item,
+      "Bu madde dönem hedefinin uygulama adımını tanımlar.",
+      "Faaliyet kapsamı, sorumlular, bağımlılıklar ve kabul kriterleriyle birlikte izlenir.",
+      "Beklenen çıktı: ölçülebilir teslim ve doğrulanabilir kayıt.",
+    ].join("\n"),
+  };
+}
 export default function Home() {
   const [selected, setSelected] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeDetail, setActiveDetail] = useState<ItemDetail | null>(null);
   const entry = timelineData[selected];
   const style = phaseStyle[entry.phase];
+
+  useEffect(() => {
+    if (!activeDetail) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setActiveDetail(null);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [activeDetail]);
 
   const handleMonthSelect = (idx: number) => {
     setSelected(idx);
     setSidebarOpen(false);
+    setActiveDetail(null);
   };
 
   return (
@@ -921,7 +957,18 @@ export default function Home() {
                           <span className={`mt-0.5 shrink-0 ${entry.status === "completed" ? "text-green-500" : "text-blue-400"}`}>
                             {entry.status === "completed" ? "✓" : "→"}
                           </span>
-                          {item}
+                          <div className="flex flex-wrap items-start gap-1.5">
+                            <span>{item}</span>
+                            <button
+                              type="button"
+                              onClick={() => setActiveDetail(getItemDetail(entry.period, cat.category, item))}
+                              className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-sky-300 bg-sky-50 text-[11px] font-bold text-sky-700 hover:bg-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                              aria-label={`Detayı aç: ${item}`}
+                              title="Detayı gör"
+                            >
+                              ⓘ
+                            </button>
+                          </div>
                         </li>
                       ))}
                     </ul>
@@ -969,13 +1016,19 @@ export default function Home() {
               {/* Navigation buttons */}
               <div className="flex gap-2">
                 {selected > 0 && (
-                  <button onClick={() => setSelected(selected - 1)}
+                  <button onClick={() => {
+                    setSelected(selected - 1);
+                    setActiveDetail(null);
+                  }}
                     className="flex-1 py-2 px-3 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                     ← {timelineData[selected - 1].period}
                   </button>
                 )}
                 {selected < timelineData.length - 1 && (
-                  <button onClick={() => setSelected(selected + 1)}
+                  <button onClick={() => {
+                    setSelected(selected + 1);
+                    setActiveDetail(null);
+                  }}
                     className="flex-1 py-2 px-3 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                     {timelineData[selected + 1].period} →
                   </button>
@@ -1001,6 +1054,40 @@ export default function Home() {
         </div>
       </footer>
       </div>{/* end right side */}
+
+      {activeDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setActiveDetail(null)}
+            aria-label="Detay penceresini kapat"
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={activeDetail.title}
+            className="relative z-10 w-full max-w-2xl rounded-xl border border-slate-200 bg-white shadow-2xl"
+          >
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">Madde Detayı</p>
+                <h4 className="text-sm font-semibold text-slate-800">{activeDetail.title}</h4>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveDetail(null)}
+                className="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50"
+              >
+                Kapat
+              </button>
+            </div>
+            <div className="max-h-[65vh] overflow-y-auto px-4 py-4">
+              <p className="whitespace-pre-line text-sm leading-6 text-slate-700">{activeDetail.body}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
