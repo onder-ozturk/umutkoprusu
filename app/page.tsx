@@ -729,43 +729,16 @@ export default function Home() {
 
         {/* ── FOOTER ── */}
       <footer className="bg-gray-900 text-gray-300 shrink-0">
-        <div className="max-w-6xl mx-auto px-6 py-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Company */}
-            <div>
-              <h3 className="text-white font-bold text-sm mb-3">KEREGE Yazılım</h3>
-              <p className="text-xs leading-relaxed text-gray-400">
-                KEREGE Yazılım Bilişim Teknolojileri A.Ş., sağlık teknolojileri alanında
-                yenilikçi dijital çözümler geliştiren Türkiye merkezli bir yazılım şirketidir.
-              </p>
+        <div className="px-6 py-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap gap-6 text-xs text-gray-400">
+              <span className="text-white font-semibold">KEREGE Yazılım Bilişim Teknolojileri A.Ş.</span>
+              <span>Proje: AL-TR-25-DPS-MVP</span>
+              <span>Destekleyen: TÜBİTAK / TGB</span>
+              <span>Yönetici: Önder Öztürk</span>
+              <span>info@kerege.com.tr</span>
             </div>
-            {/* Project */}
-            <div>
-              <h3 className="text-white font-bold text-sm mb-3">AffectLog-TR Projesi</h3>
-              <ul className="text-xs space-y-1.5 text-gray-400">
-                <li>Proje Kodu: AL-TR-25-DPS-MVP</li>
-                <li>Destekleyen: TÜBİTAK / TGB</li>
-                <li>Başlangıç: 05.12.2025</li>
-                <li>Süre: 24 Ay</li>
-                <li>Proje Yöneticisi: Önder Öztürk</li>
-              </ul>
-            </div>
-            {/* Contact */}
-            <div>
-              <h3 className="text-white font-bold text-sm mb-3">İletişim</h3>
-              <ul className="text-xs space-y-1.5 text-gray-400">
-                <li>info@kerege.com.tr</li>
-                <li>Türkiye</li>
-                <li className="pt-2 text-gray-500">
-                  Bu site TÜBİTAK destekli AffectLog-TR projesinin<br />
-                  ilerleme raporlama platformudur.
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-6 flex flex-wrap justify-between items-center gap-3 text-xs text-gray-500">
-            <span>© 2025–2027 KEREGE Yazılım Bilişim Teknolojileri A.Ş. Tüm hakları saklıdır.</span>
-            <span>AffectLog-TR — Dijital Psikolojik Destek Platformu</span>
+            <span className="text-xs text-gray-500">© 2025–2027 Tüm hakları saklıdır.</span>
           </div>
         </div>
       </footer>
