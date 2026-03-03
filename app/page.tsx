@@ -535,23 +535,61 @@ const statusIcon = (s: TimelineEntry["status"]) =>
 const statusDotClass = (s: TimelineEntry["status"]) =>
   s === "completed" ? "bg-green-500" : s === "ongoing" ? "bg-yellow-400" : "bg-gray-300";
 
+const statusLabel = (s: TimelineEntry["status"]) =>
+  s === "completed" ? "Tamamlandı" : s === "ongoing" ? "Devam Ediyor" : "Planlandı";
+
 export default function Home() {
   const [selected, setSelected] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const entry = timelineData[selected];
   const style = phaseStyle[entry.phase];
+
+  const handleMonthSelect = (idx: number) => {
+    setSelected(idx);
+    setSidebarOpen(false);
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 font-sans overflow-hidden">
 
+      {/* ── MOBİL OVERLAY ── */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-20 bg-black/40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       {/* ── SIDEBAR ── full height */}
-      <aside className="w-64 shrink-0 bg-white border-r border-gray-200 flex flex-col h-full">
+      <aside
+        id="sidebar"
+        className={`
+          fixed z-30 top-0 left-0 h-full w-64 bg-white border-r border-gray-200 flex flex-col
+          transition-transform duration-200
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          md:relative md:translate-x-0 md:shrink-0 md:z-auto
+        `}
+        aria-label="Proje navigasyonu"
+      >
         {/* Sidebar top brand */}
-        <div className="px-4 py-4 border-b border-gray-200 shrink-0">
-          <p className="text-xs font-bold text-blue-600 uppercase tracking-wide">AffectLog-TR</p>
-          <p className="text-xs text-gray-400 mt-0.5">Proje Zaman Çizelgesi</p>
+        <div className="px-4 py-4 border-b border-gray-200 shrink-0 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold text-blue-600 uppercase tracking-wide">AffectLog-TR</p>
+            <p className="text-xs text-gray-400 mt-0.5">Proje Zaman Çizelgesi</p>
+          </div>
+          <button
+            className="md:hidden p-1 rounded text-gray-400 hover:text-gray-600"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Menüyü kapat"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
         <div className="flex-1 overflow-y-auto">
-          <nav className="py-3">
+          <nav className="py-3" aria-label="Proje fazları ve aylar">
             {phases.map((faz) => {
               const s = phaseStyle[faz.name];
               const months = timelineData.filter((d) => d.phase === faz.name);
@@ -570,16 +608,21 @@ export default function Home() {
                       return (
                         <li key={idx}>
                           <button
-                            onClick={() => setSelected(idx)}
+                            onClick={() => handleMonthSelect(idx)}
+                            aria-current={isActive ? "page" : undefined}
+                            aria-label={`${m.period} — ${statusLabel(m.status)}`}
                             className={`w-full flex items-center gap-2.5 px-5 py-2 text-left transition-colors
                               ${isActive
                                 ? `${s.bg} ${s.text} font-semibold`
                                 : "text-gray-600 hover:bg-gray-50"
                               }`}
                           >
-                            <span className={`w-2 h-2 rounded-full shrink-0 ${statusDotClass(m.status)}`} />
+                            <span
+                              className={`w-2 h-2 rounded-full shrink-0 ${statusDotClass(m.status)}`}
+                              aria-hidden="true"
+                            />
                             <span className="text-sm truncate">{m.period}</span>
-                            <span className="ml-auto text-xs opacity-50">{statusIcon(m.status)}</span>
+                            <span className="ml-auto text-xs opacity-50" aria-hidden="true">{statusIcon(m.status)}</span>
                           </button>
                         </li>
                       );
@@ -597,7 +640,19 @@ export default function Home() {
 
         {/* ── TOP HEADER ── */}
         <header className="bg-white border-b border-gray-200 shrink-0">
-          <div className="px-6 py-5 flex flex-wrap items-start justify-between gap-4">
+          <div className="px-4 md:px-6 py-5 flex flex-wrap items-start justify-between gap-4">
+            {/* Hamburger (mobile only) */}
+            <button
+              className="md:hidden p-2 -ml-1 rounded text-gray-500 hover:bg-gray-100 self-center"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Menüyü aç"
+              aria-expanded={sidebarOpen}
+              aria-controls="sidebar"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
             <div>
               <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-0.5">
                 KEREGE Yazılım Bilişim Teknolojileri A.Ş.
