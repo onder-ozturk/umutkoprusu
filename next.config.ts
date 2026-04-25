@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "export",
+  // Remove 'export' to support API routes on Vercel
   images: {
     unoptimized: true,
   },
