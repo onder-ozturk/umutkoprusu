@@ -1644,7 +1644,7 @@ export default function Home() {
                   value={newSuggestionText}
                   onChange={(e) => setNewSuggestionText(e.target.value)}
                   placeholder="Önersinizi yazın..."
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2 text-sm text-slate-900 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent resize-none"
                   rows={4}
                 />
               </div>
@@ -1718,7 +1718,7 @@ export default function Home() {
                           <textarea
                             value={editingText}
                             onChange={(e) => setEditingText(e.target.value)}
-                            className="w-full px-2 py-1.5 text-xs border border-blue-300 rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                            className="w-full px-2 py-1.5 text-xs text-slate-900 border border-blue-300 rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
                             rows={3}
                           />
                           <div className="flex gap-2">
@@ -1816,7 +1816,7 @@ export default function Home() {
                             <textarea
                               value={editingText}
                               onChange={(e) => setEditingText(e.target.value)}
-                              className="w-full px-2 py-1.5 text-xs border border-blue-300 rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                              className="w-full px-2 py-1.5 text-xs text-slate-900 border border-blue-300 rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
                               rows={3}
                             />
                             <div className="flex gap-1">
