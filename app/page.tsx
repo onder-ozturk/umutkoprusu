@@ -747,16 +747,63 @@ function getItemDetail(period: string, category: string, item: string): ItemDeta
     tags: [category],
   };
 }
-// Suggestions localStorage helpers
-const loadSuggestions = (): Suggestion[] => {
-  if (typeof window === "undefined") return [];
-  const stored = localStorage.getItem("suggestions");
-  return stored ? JSON.parse(stored) : [];
+// Suggestions API helpers
+const API_URL = "https://umutkoprusu-api.oo25101981.workers.dev";
+
+const loadSuggestions = async (): Promise<Suggestion[]> => {
+  try {
+    const response = await fetch(`${API_URL}/api/suggestions`);
+    if (!response.ok) throw new Error("Failed to fetch suggestions");
+    return await response.json();
+  } catch (error) {
+    console.error("Error loading suggestions:", error);
+    return [];
+  }
 };
 
-const saveSuggestions = (suggestions: Suggestion[]) => {
-  if (typeof window === "undefined") return;
-  localStorage.setItem("suggestions", JSON.stringify(suggestions));
+const addSuggestion = async (suggestion: Omit<Suggestion, "id">): Promise<Suggestion | null> => {
+  try {
+    const response = await fetch(`${API_URL}/api/suggestions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(suggestion),
+    });
+    if (!response.ok) throw new Error("Failed to save suggestion");
+    return await response.json();
+  } catch (error) {
+    console.error("Error saving suggestion:", error);
+    return null;
+  }
+};
+
+const updateSuggestion = async (id: string, suggestion: string): Promise<Suggestion | null> => {
+  try {
+    const response = await fetch(`${API_URL}/api/suggestions`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, suggestion }),
+    });
+    if (!response.ok) throw new Error("Failed to update suggestion");
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating suggestion:", error);
+    return null;
+  }
+};
+
+const removeSuggestion = async (id: string): Promise<boolean> => {
+  try {
+    const response = await fetch(`${API_URL}/api/suggestions`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    if (!response.ok) throw new Error("Failed to delete suggestion");
+    return true;
+  } catch (error) {
+    console.error("Error deleting suggestion:", error);
+    return false;
+  }
 };
 
 export default function Home() {
@@ -764,7 +811,8 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeDetail, setActiveDetail] = useState<ItemDetail | null>(null);
   const [activeSection, setActiveSection] = useState<Section | null>(null);
-  const [suggestions, setSuggestions] = useState<Suggestion[]>(() => loadSuggestions());
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
   const [showSuggestionsListModal, setShowSuggestionsListModal] = useState(false);
   const [suggestionsForItem, setSuggestionsForItem] = useState<Suggestion[]>([]);
@@ -792,21 +840,21 @@ export default function Home() {
     setShowSuggestionModal(true);
   };
 
-  const saveSuggestion = () => {
+  const saveSuggestion = async () => {
     if (!currentItem || !newSuggestionText.trim()) return;
-    const newSugg: Suggestion = {
-      id: Date.now().toString(),
+    const newSugg = {
       itemText: currentItem.itemText,
       category: currentItem.category,
       period: currentItem.period,
       suggestion: newSuggestionText,
       timestamp: Date.now(),
     };
-    const updated = [...suggestions, newSugg];
-    setSuggestions(updated);
-    saveSuggestions(updated);
-    setShowSuggestionModal(false);
-    setNewSuggestionText("");
+    const result = await addSuggestion(newSugg);
+    if (result) {
+      setSuggestions([...suggestions, result]);
+      setShowSuggestionModal(false);
+      setNewSuggestionText("");
+    }
   };
 
   const openSuggestionsListModal = (detail: ItemDetail) => {
@@ -818,11 +866,13 @@ export default function Home() {
     setShowSuggestionsListModal(true);
   };
 
-  const deleteSuggestion = (id: string) => {
-    const updated = suggestions.filter((s) => s.id !== id);
-    setSuggestions(updated);
-    saveSuggestions(updated);
-    setSuggestionsForItem(suggestionsForItem.filter((s) => s.id !== id));
+  const deleteSuggestion = async (id: string) => {
+    const success = await removeSuggestion(id);
+    if (success) {
+      const updated = suggestions.filter((s) => s.id !== id);
+      setSuggestions(updated);
+      setSuggestionsForItem(suggestionsForItem.filter((s) => s.id !== id));
+    }
   };
 
   const startEditSuggestion = (id: string, currentText: string) => {
@@ -830,26 +880,37 @@ export default function Home() {
     setEditingText(currentText);
   };
 
-  const saveEditSuggestion = (id: string) => {
+  const saveEditSuggestion = async (id: string) => {
     if (!editingText.trim()) return;
-    const updated = suggestions.map((s) =>
-      s.id === id ? { ...s, suggestion: editingText } : s
-    );
-    setSuggestions(updated);
-    saveSuggestions(updated);
-    setSuggestionsForItem(
-      suggestionsForItem.map((s) =>
+    const result = await updateSuggestion(id, editingText);
+    if (result) {
+      const updated = suggestions.map((s) =>
         s.id === id ? { ...s, suggestion: editingText } : s
-      )
-    );
-    setEditingSuggestionId(null);
-    setEditingText("");
+      );
+      setSuggestions(updated);
+      setSuggestionsForItem(
+        suggestionsForItem.map((s) =>
+          s.id === id ? { ...s, suggestion: editingText } : s
+        )
+      );
+      setEditingSuggestionId(null);
+      setEditingText("");
+    }
   };
 
   const cancelEditSuggestion = () => {
     setEditingSuggestionId(null);
     setEditingText("");
   };
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      const data = await loadSuggestions();
+      setSuggestions(data);
+      setIsLoading(false);
+    };
+    fetchSuggestions();
+  }, []);
 
   useEffect(() => {
     if (!activeDetail) return;

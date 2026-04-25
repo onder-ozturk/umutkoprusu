@@ -1,12 +1,16 @@
 name = "umutkoprusu-api"
-type = "javascript"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "suggestions"
-database_id = "YOUR_DATABASE_ID"
+database_id = "93ffccb8-f3b2-4e5c-8506-c1283f4a4552"
 
 [env.production]
 vars = { ENVIRONMENT = "production" }
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "suggestions"
+database_id = "93ffccb8-f3b2-4e5c-8506-c1283f4a4552"
