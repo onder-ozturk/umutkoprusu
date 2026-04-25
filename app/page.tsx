@@ -771,6 +771,8 @@ export default function Home() {
   const [currentItem, setCurrentItem] = useState<ItemDetail | null>(null);
   const [newSuggestionText, setNewSuggestionText] = useState("");
   const [showSuggestionsPanel, setShowSuggestionsPanel] = useState(false);
+  const [editingSuggestionId, setEditingSuggestionId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState("");
 
   const entry = timelineData[selected];
   const style = phaseStyle[entry.phase];
@@ -821,6 +823,38 @@ export default function Home() {
     setSuggestions(updated);
     saveSuggestions(updated);
     setSuggestionsForItem(suggestionsForItem.filter((s) => s.id !== id));
+  };
+
+  const startEditSuggestion = (id: string, currentText: string) => {
+    setEditingSuggestionId(id);
+    setEditingText(currentText);
+  };
+
+  const saveEditSuggestion = (id: string) => {
+    if (!editingText.trim()) return;
+    const updated = suggestions.map((s) =>
+      s.id === id ? { ...s, suggestion: editingText } : s
+    );
+    setSuggestions(updated);
+    saveSuggestions(updated);
+    setSuggestionsForItem(
+      suggestionsForItem.map((s) =>
+        s.id === id ? { ...s, suggestion: editingText } : s
+      )
+    );
+    setEditingSuggestionId(null);
+    setEditingText("");
+  };
+
+  const cancelEditSuggestion = () => {
+    setEditingSuggestionId(null);
+    setEditingText("");
+  };
+
+  const addNewSuggestion = () => {
+    setCurrentItem(null);
+    setNewSuggestionText("");
+    setShowSuggestionModal(true);
   };
 
   useEffect(() => {
@@ -1716,44 +1750,100 @@ export default function Home() {
 
           {/* Content */}
           {showSuggestionsPanel && (
-            <div className="overflow-y-auto h-80 px-4 py-4 space-y-4">
-              {suggestions.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-sm text-slate-500">Henüz önersi yok</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {suggestions.map((sugg) => (
-                    <div key={sugg.id} className="border border-slate-200 rounded-lg p-3 bg-slate-50 hover:bg-slate-100 transition-colors">
-                      {/* Date & Time */}
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="text-xs font-medium text-slate-600">
+            <>
+              {/* Yeni Önersi Butonu */}
+              <div className="px-4 py-3 border-b border-slate-200 bg-slate-50">
+                <button
+                  type="button"
+                  onClick={addNewSuggestion}
+                  className="w-full px-3 py-2 text-xs font-medium text-white bg-green-500 hover:bg-green-600 rounded-lg transition-colors"
+                >
+                  ✎ Yeni Önersi
+                </button>
+              </div>
+
+              {/* Liste */}
+              <div className="overflow-y-auto h-72 px-4 py-4 space-y-3">
+                {suggestions.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-slate-500">Henüz önersi yok</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {suggestions.map((sugg) => (
+                      <div key={sugg.id} className="border border-slate-200 rounded-lg p-3 bg-slate-50 hover:bg-slate-100 transition-colors">
+                        {/* Date & Time */}
+                        <div className="text-xs font-medium text-slate-600 mb-2">
                           <div className="flex gap-2">
                             <span>📅 {new Date(sugg.timestamp).toLocaleDateString("tr-TR")}</span>
                             <span>⏰ {new Date(sugg.timestamp).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}</span>
                           </div>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => deleteSuggestion(sugg.id)}
-                          className="text-xs text-red-500 hover:text-red-700 font-medium"
-                          title="Sil"
-                        >
-                          ✕
-                        </button>
+
+                        {/* Item info */}
+                        <p className="text-xs text-slate-600 mb-1.5">
+                          <span className="font-semibold text-slate-700">{sugg.itemText}</span>
+                          <span className="text-slate-500"> • {sugg.category}</span>
+                        </p>
+
+                        {/* Edit mode or view mode */}
+                        {editingSuggestionId === sugg.id ? (
+                          <>
+                            <textarea
+                              value={editingText}
+                              onChange={(e) => setEditingText(e.target.value)}
+                              className="w-full px-2 py-1.5 text-xs border border-blue-300 rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                              rows={3}
+                            />
+                            <div className="flex gap-1">
+                              <button
+                                type="button"
+                                onClick={() => saveEditSuggestion(sugg.id)}
+                                className="flex-1 px-2 py-1 text-[11px] font-medium text-white bg-blue-500 hover:bg-blue-600 rounded transition-colors"
+                              >
+                                ✓ Kaydet
+                              </button>
+                              <button
+                                type="button"
+                                onClick={cancelEditSuggestion}
+                                className="flex-1 px-2 py-1 text-[11px] font-medium text-slate-700 bg-slate-300 hover:bg-slate-400 rounded transition-colors"
+                              >
+                                ✕ İptal
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {/* Suggestion text */}
+                            <p className="text-sm text-slate-700 leading-relaxed mb-2">{sugg.suggestion}</p>
+
+                            {/* Action buttons */}
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => startEditSuggestion(sugg.id, sugg.suggestion)}
+                                className="flex-1 px-2 py-1 text-[11px] font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded border border-blue-200 transition-colors"
+                                title="Düzenle"
+                              >
+                                ✎ Düzenle
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => deleteSuggestion(sugg.id)}
+                                className="flex-1 px-2 py-1 text-[11px] font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded border border-red-200 transition-colors"
+                                title="Sil"
+                              >
+                                🗑 Sil
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </div>
-                      {/* Item info */}
-                      <p className="text-xs text-slate-600 mb-1.5">
-                        <span className="font-semibold text-slate-700">{sugg.itemText}</span>
-                        <span className="text-slate-500"> • {sugg.category}</span>
-                      </p>
-                      {/* Suggestion text */}
-                      <p className="text-sm text-slate-700 leading-relaxed">{sugg.suggestion}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
           )}
         </div>
       </div>
