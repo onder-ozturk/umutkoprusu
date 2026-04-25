@@ -794,7 +794,7 @@ export default function Home() {
 
   const saveSuggestion = () => {
     if (!currentItem || !newSuggestionText.trim()) return;
-    const newSuggestion: Suggestion = {
+    const newSugg: Suggestion = {
       id: Date.now().toString(),
       itemText: currentItem.itemText,
       category: currentItem.category,
@@ -802,7 +802,7 @@ export default function Home() {
       suggestion: newSuggestionText,
       timestamp: Date.now(),
     };
-    const updated = [...suggestions, newSuggestion];
+    const updated = [...suggestions, newSugg];
     setSuggestions(updated);
     saveSuggestions(updated);
     setShowSuggestionModal(false);
