@@ -770,6 +770,7 @@ export default function Home() {
   const [suggestionsForItem, setSuggestionsForItem] = useState<Suggestion[]>([]);
   const [currentItem, setCurrentItem] = useState<ItemDetail | null>(null);
   const [newSuggestionText, setNewSuggestionText] = useState("");
+  const [showSuggestionsPanel, setShowSuggestionsPanel] = useState(false);
 
   const entry = timelineData[selected];
   const style = phaseStyle[entry.phase];
@@ -1699,6 +1700,63 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* ── Floating Panel: Tüm Öneriler ──────────────────────────────────────────────── */}
+      <div className={`fixed bottom-6 right-6 z-40 transition-all duration-300 ${showSuggestionsPanel ? "w-96" : "w-16"}`}>
+        <div className={`bg-white rounded-lg shadow-lg border border-slate-200 overflow-hidden ${showSuggestionsPanel ? "h-96" : "h-16"}`}>
+          {/* Toggle button / Header */}
+          <button
+            type="button"
+            onClick={() => setShowSuggestionsPanel(!showSuggestionsPanel)}
+            className={`w-full flex items-center justify-between px-4 py-3 ${showSuggestionsPanel ? "bg-purple-600 text-white" : "bg-purple-500 hover:bg-purple-600 text-white"} transition-colors`}
+          >
+            <span className={`font-semibold text-sm ${!showSuggestionsPanel ? "hidden" : ""}`}>📋 Tüm Öneriler</span>
+            <span className="text-lg">{!showSuggestionsPanel ? "📋" : "✕"}</span>
+          </button>
+
+          {/* Content */}
+          {showSuggestionsPanel && (
+            <div className="overflow-y-auto h-80 px-4 py-4 space-y-4">
+              {suggestions.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-sm text-slate-500">Henüz önersi yok</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {suggestions.map((sugg) => (
+                    <div key={sugg.id} className="border border-slate-200 rounded-lg p-3 bg-slate-50 hover:bg-slate-100 transition-colors">
+                      {/* Date & Time */}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-xs font-medium text-slate-600">
+                          <div className="flex gap-2">
+                            <span>📅 {new Date(sugg.timestamp).toLocaleDateString("tr-TR")}</span>
+                            <span>⏰ {new Date(sugg.timestamp).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => deleteSuggestion(sugg.id)}
+                          className="text-xs text-red-500 hover:text-red-700 font-medium"
+                          title="Sil"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      {/* Item info */}
+                      <p className="text-xs text-slate-600 mb-1.5">
+                        <span className="font-semibold text-slate-700">{sugg.itemText}</span>
+                        <span className="text-slate-500"> • {sugg.category}</span>
+                      </p>
+                      {/* Suggestion text */}
+                      <p className="text-sm text-slate-700 leading-relaxed">{sugg.suggestion}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
