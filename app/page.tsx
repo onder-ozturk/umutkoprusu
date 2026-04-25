@@ -1713,19 +1713,60 @@ export default function Home() {
                 <ul className="space-y-3">
                   {suggestionsForItem.map((sugg) => (
                     <li key={sugg.id} className="border border-green-200 bg-green-50 rounded-lg p-3">
-                      <div className="flex justify-between items-start gap-2 mb-2">
-                        <p className="text-xs text-green-700 font-medium">
-                          {new Date(sugg.timestamp).toLocaleDateString("tr-TR")} {new Date(sugg.timestamp).toLocaleTimeString("tr-TR")}
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() => deleteSuggestion(sugg.id)}
-                          className="text-xs text-red-600 hover:text-red-700 font-medium"
-                        >
-                          Sil
-                        </button>
+                      {/* Date & Time */}
+                      <div className="text-xs text-green-700 font-medium mb-2">
+                        {new Date(sugg.timestamp).toLocaleDateString("tr-TR")} {new Date(sugg.timestamp).toLocaleTimeString("tr-TR")}
                       </div>
-                      <p className="text-sm text-slate-700">{sugg.suggestion}</p>
+
+                      {/* Edit mode or view mode */}
+                      {editingSuggestionId === sugg.id ? (
+                        <>
+                          <textarea
+                            value={editingText}
+                            onChange={(e) => setEditingText(e.target.value)}
+                            className="w-full px-2 py-1.5 text-xs border border-blue-300 rounded mb-2 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                            rows={3}
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => saveEditSuggestion(sugg.id)}
+                              className="flex-1 px-2 py-1 text-[11px] font-medium text-white bg-blue-500 hover:bg-blue-600 rounded transition-colors"
+                            >
+                              ✓ Kaydet
+                            </button>
+                            <button
+                              type="button"
+                              onClick={cancelEditSuggestion}
+                              className="flex-1 px-2 py-1 text-[11px] font-medium text-slate-700 bg-slate-300 hover:bg-slate-400 rounded transition-colors"
+                            >
+                              ✕ İptal
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-sm text-slate-700 mb-2">{sugg.suggestion}</p>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => startEditSuggestion(sugg.id, sugg.suggestion)}
+                              className="flex-1 px-2 py-1 text-[11px] font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded border border-blue-200 transition-colors"
+                              title="Düzenle"
+                            >
+                              ✎ Düzenle
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteSuggestion(sugg.id)}
+                              className="flex-1 px-2 py-1 text-[11px] font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded border border-red-200 transition-colors"
+                              title="Sil"
+                            >
+                              🗑 Sil
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </li>
                   ))}
                 </ul>
