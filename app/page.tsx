@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { timelineDetails, timelineDetailsRich, type Section } from "./timelineDetails";
 
 type UpgradeNote = { category: string; note: string };
+type Suggestion = { id: string; itemText: string; category: string; period: string; suggestion: string; timestamp: number };
 type ItemDetail = {
   title: string;
   itemText: string;
@@ -746,13 +747,37 @@ function getItemDetail(period: string, category: string, item: string): ItemDeta
     tags: [category],
   };
 }
+// Suggestions localStorage helpers
+const loadSuggestions = (): Suggestion[] => {
+  if (typeof window === "undefined") return [];
+  const stored = localStorage.getItem("suggestions");
+  return stored ? JSON.parse(stored) : [];
+};
+
+const saveSuggestions = (suggestions: Suggestion[]) => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem("suggestions", JSON.stringify(suggestions));
+};
+
 export default function Home() {
   const [selected, setSelected] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeDetail, setActiveDetail] = useState<ItemDetail | null>(null);
   const [activeSection, setActiveSection] = useState<Section | null>(null);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false);
+  const [showSuggestionsListModal, setShowSuggestionsListModal] = useState(false);
+  const [suggestionsForItem, setSuggestionsForItem] = useState<Suggestion[]>([]);
+  const [currentItem, setCurrentItem] = useState<ItemDetail | null>(null);
+  const [newSuggestionText, setNewSuggestionText] = useState("");
+
   const entry = timelineData[selected];
   const style = phaseStyle[entry.phase];
+
+  // Load suggestions on mount
+  useEffect(() => {
+    setSuggestions(loadSuggestions());
+  }, []);
 
   const openDetail = (detail: ItemDetail) => {
     setActiveSection(null);
@@ -761,6 +786,45 @@ export default function Home() {
   const closeDetail = () => {
     setActiveSection(null);
     setActiveDetail(null);
+  };
+
+  const openSuggestionModal = (detail: ItemDetail) => {
+    setCurrentItem(detail);
+    setNewSuggestionText("");
+    setShowSuggestionModal(true);
+  };
+
+  const saveSuggestion = () => {
+    if (!currentItem || !newSuggestionText.trim()) return;
+    const newSuggestion: Suggestion = {
+      id: Date.now().toString(),
+      itemText: currentItem.itemText,
+      category: currentItem.category,
+      period: currentItem.period,
+      suggestion: newSuggestionText,
+      timestamp: Date.now(),
+    };
+    const updated = [...suggestions, newSuggestion];
+    setSuggestions(updated);
+    saveSuggestions(updated);
+    setShowSuggestionModal(false);
+    setNewSuggestionText("");
+  };
+
+  const openSuggestionsListModal = (detail: ItemDetail) => {
+    const related = suggestions.filter(
+      (s) => s.itemText === detail.itemText && s.period === detail.period
+    );
+    setSuggestionsForItem(related);
+    setCurrentItem(detail);
+    setShowSuggestionsListModal(true);
+  };
+
+  const deleteSuggestion = (id: string) => {
+    const updated = suggestions.filter((s) => s.id !== id);
+    setSuggestions(updated);
+    saveSuggestions(updated);
+    setSuggestionsForItem(suggestionsForItem.filter((s) => s.id !== id));
   };
 
   useEffect(() => {
@@ -999,17 +1063,40 @@ export default function Home() {
                           <span className={`mt-0.5 shrink-0 ${entry.status === "completed" ? "text-green-500" : "text-blue-400"}`}>
                             {entry.status === "completed" ? "✓" : "→"}
                           </span>
-                          <div className="flex flex-wrap items-start gap-1.5">
+                          <div className="flex flex-wrap items-start gap-1">
                             <span>{item}</span>
-                            <button
-                              type="button"
-                              onClick={() => openDetail(getItemDetail(entry.period, cat.category, item))}
-                              className="cursor-pointer inline-flex h-5 w-5 items-center justify-center rounded-full border border-sky-300 bg-sky-50 text-[11px] font-bold text-sky-700 hover:bg-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
-                              aria-label={`Detayı aç: ${item}`}
-                              title="Detayı gör"
-                            >
-                              ⓘ
-                            </button>
+                            <div className="flex gap-0.5">
+                              {/* Info icon */}
+                              <button
+                                type="button"
+                                onClick={() => openDetail(getItemDetail(entry.period, cat.category, item))}
+                                className="cursor-pointer inline-flex h-5 w-5 items-center justify-center rounded-full border border-sky-300 bg-sky-50 text-[11px] font-bold text-sky-700 hover:bg-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                                aria-label={`Detayı aç: ${item}`}
+                                title="Detayı gör"
+                              >
+                                ⓘ
+                              </button>
+                              {/* Add suggestion icon */}
+                              <button
+                                type="button"
+                                onClick={() => openSuggestionModal(getItemDetail(entry.period, cat.category, item))}
+                                className="cursor-pointer inline-flex h-5 w-5 items-center justify-center rounded-full border border-amber-300 bg-amber-50 text-[11px] font-bold text-amber-700 hover:bg-amber-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                                aria-label={`Önersi ekle: ${item}`}
+                                title="Önersi ekle"
+                              >
+                                ✎
+                              </button>
+                              {/* View suggestions icon */}
+                              <button
+                                type="button"
+                                onClick={() => openSuggestionsListModal(getItemDetail(entry.period, cat.category, item))}
+                                className="cursor-pointer inline-flex h-5 w-5 items-center justify-center rounded-full border border-green-300 bg-green-50 text-[11px] font-bold text-green-700 hover:bg-green-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400"
+                                aria-label={`Önerileri gör: ${item}`}
+                                title="Önerileri listele"
+                              >
+                                ◈
+                              </button>
+                            </div>
                           </div>
                         </li>
                       ))}
@@ -1488,6 +1575,130 @@ export default function Home() {
                   <p className="text-[10px] font-semibold text-slate-700 mb-1">Teşekkür</p>
                   <p className="text-[10px] text-slate-600 leading-relaxed">{activeSection.acknowledgement}</p>
                 </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 3. Popup: Önersi Ekle ──────────────────────────────────────────────────────── */}
+      {showSuggestionModal && currentItem && (
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-6">
+          <button
+            type="button"
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm cursor-default"
+            onClick={() => setShowSuggestionModal(false)}
+            aria-label="Kapat"
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Önersi Ekle"
+            className="relative z-10 w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl bg-white shadow-[0_32px_72px_-8px_rgba(0,0,0,0.28)] overflow-hidden"
+          >
+            <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-slate-100">
+              <h4 className="text-sm font-semibold text-slate-800">Önersi Ekle</h4>
+              <button
+                type="button"
+                onClick={() => setShowSuggestionModal(false)}
+                className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                aria-label="Kapat"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="px-5 py-4 space-y-4">
+              <div>
+                <p className="text-xs font-medium text-slate-600 mb-1">Başlık</p>
+                <p className="text-sm text-slate-800">{currentItem.itemText}</p>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-2">Yapılması gereken önersi*</label>
+                <textarea
+                  value={newSuggestionText}
+                  onChange={(e) => setNewSuggestionText(e.target.value)}
+                  placeholder="Önersinizi yazın..."
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent resize-none"
+                  rows={4}
+                />
+              </div>
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowSuggestionModal(false)}
+                  className="flex-1 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  İptal
+                </button>
+                <button
+                  type="button"
+                  onClick={saveSuggestion}
+                  disabled={!newSuggestionText.trim()}
+                  className="flex-1 px-3 py-2 text-sm font-medium text-white bg-amber-500 rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Kaydet
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 4. Popup: Önerileri Listele ────────────────────────────────────────────────── */}
+      {showSuggestionsListModal && currentItem && (
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-6">
+          <button
+            type="button"
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm cursor-default"
+            onClick={() => setShowSuggestionsListModal(false)}
+            aria-label="Kapat"
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Önerileri Listele"
+            className="relative z-10 w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl bg-white shadow-[0_32px_72px_-8px_rgba(0,0,0,0.28)] overflow-hidden"
+          >
+            <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-3 border-b border-slate-100">
+              <h4 className="text-sm font-semibold text-slate-800">Önerileri Listele</h4>
+              <button
+                type="button"
+                onClick={() => setShowSuggestionsListModal(false)}
+                className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400"
+                aria-label="Kapat"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="px-5 py-4 max-h-96 overflow-y-auto">
+              {suggestionsForItem.length === 0 ? (
+                <div className="text-center py-6">
+                  <p className="text-sm text-slate-500">Bu başlık için henüz önersi yok.</p>
+                </div>
+              ) : (
+                <ul className="space-y-3">
+                  {suggestionsForItem.map((sugg) => (
+                    <li key={sugg.id} className="border border-green-200 bg-green-50 rounded-lg p-3">
+                      <div className="flex justify-between items-start gap-2 mb-2">
+                        <p className="text-xs text-green-700 font-medium">
+                          {new Date(sugg.timestamp).toLocaleDateString("tr-TR")} {new Date(sugg.timestamp).toLocaleTimeString("tr-TR")}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => deleteSuggestion(sugg.id)}
+                          className="text-xs text-red-600 hover:text-red-700 font-medium"
+                        >
+                          Sil
+                        </button>
+                      </div>
+                      <p className="text-sm text-slate-700">{sugg.suggestion}</p>
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
           </div>
