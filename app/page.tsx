@@ -851,12 +851,6 @@ export default function Home() {
     setEditingText("");
   };
 
-  const addNewSuggestion = () => {
-    setCurrentItem(null);
-    setNewSuggestionText("");
-    setShowSuggestionModal(true);
-  };
-
   useEffect(() => {
     if (!activeDetail) return;
     const onKeyDown = (event: KeyboardEvent) => {
@@ -1792,17 +1786,6 @@ export default function Home() {
           {/* Content */}
           {showSuggestionsPanel && (
             <>
-              {/* Yeni Önersi Butonu */}
-              <div className="px-4 py-3 border-b border-slate-200 bg-slate-50">
-                <button
-                  type="button"
-                  onClick={addNewSuggestion}
-                  className="w-full px-3 py-2 text-xs font-medium text-white bg-green-500 hover:bg-green-600 rounded-lg transition-colors"
-                >
-                  ✎ Yeni Önersi
-                </button>
-              </div>
-
               {/* Liste */}
               <div className="overflow-y-auto h-72 px-4 py-4 space-y-3">
                 {suggestions.length === 0 ? (
