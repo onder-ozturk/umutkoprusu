@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +15,7 @@ interface Suggestion {
 
 export async function GET() {
   try {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("suggestions")
       .select("*")
@@ -30,6 +31,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as Omit<Suggestion, "id">;
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("suggestions")
       .insert([
@@ -58,6 +60,7 @@ export async function PUT(request: NextRequest) {
       suggestion: string;
     };
 
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("suggestions")
       .update({ suggestion })
@@ -79,6 +82,7 @@ export async function DELETE(request: NextRequest) {
   try {
     const { id } = (await request.json()) as { id: string };
 
+    const supabase = getSupabaseClient();
     const { error } = await supabase.from("suggestions").delete().eq("id", id);
 
     if (error) throw error;
