@@ -764,7 +764,7 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeDetail, setActiveDetail] = useState<ItemDetail | null>(null);
   const [activeSection, setActiveSection] = useState<Section | null>(null);
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>(() => loadSuggestions());
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
   const [showSuggestionsListModal, setShowSuggestionsListModal] = useState(false);
   const [suggestionsForItem, setSuggestionsForItem] = useState<Suggestion[]>([]);
@@ -773,11 +773,6 @@ export default function Home() {
 
   const entry = timelineData[selected];
   const style = phaseStyle[entry.phase];
-
-  // Load suggestions on mount
-  useEffect(() => {
-    setSuggestions(loadSuggestions());
-  }, []);
 
   const openDetail = (detail: ItemDetail) => {
     setActiveSection(null);
