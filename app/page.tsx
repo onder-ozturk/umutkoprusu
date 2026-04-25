@@ -910,6 +910,15 @@ export default function Home() {
     fetchSuggestions();
   }, []);
 
+  // Polling: Her 3 saniyede önerileri kontrol et
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const data = await loadSuggestions();
+      setSuggestions(data);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     if (!activeDetail) return;
     const onKeyDown = (event: KeyboardEvent) => {
