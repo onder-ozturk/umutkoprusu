@@ -812,7 +812,6 @@ export default function Home() {
   const [activeDetail, setActiveDetail] = useState<ItemDetail | null>(null);
   const [activeSection, setActiveSection] = useState<Section | null>(null);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
   const [showSuggestionsListModal, setShowSuggestionsListModal] = useState(false);
   const [suggestionsForItem, setSuggestionsForItem] = useState<Suggestion[]>([]);
@@ -907,7 +906,6 @@ export default function Home() {
     const fetchSuggestions = async () => {
       const data = await loadSuggestions();
       setSuggestions(data);
-      setIsLoading(false);
     };
     fetchSuggestions();
   }, []);

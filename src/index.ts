@@ -37,8 +37,9 @@ export default {
         return new Response(JSON.stringify(result.results || []), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
-      } catch (error: any) {
-        return new Response(JSON.stringify({ error: 'Failed to fetch suggestions', details: error?.message }), {
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return new Response(JSON.stringify({ error: 'Failed to fetch suggestions', details: message }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -60,8 +61,9 @@ export default {
           status: 201,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
-      } catch (error: any) {
-        return new Response(JSON.stringify({ error: 'Failed to create suggestion', details: error?.message }), {
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return new Response(JSON.stringify({ error: 'Failed to create suggestion', details: message }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -81,8 +83,9 @@ export default {
         return new Response(JSON.stringify(result), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
-      } catch (error: any) {
-        return new Response(JSON.stringify({ error: 'Failed to update suggestion', details: error?.message }), {
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return new Response(JSON.stringify({ error: 'Failed to update suggestion', details: message }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -99,8 +102,9 @@ export default {
         return new Response(JSON.stringify({ success: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
-      } catch (error: any) {
-        return new Response(JSON.stringify({ error: 'Failed to delete suggestion', details: error?.message }), {
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return new Response(JSON.stringify({ error: 'Failed to delete suggestion', details: message }), {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
