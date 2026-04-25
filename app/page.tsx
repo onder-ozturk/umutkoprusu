@@ -1926,6 +1926,25 @@ export default function Home() {
                   </div>
                 )}
               </div>
+
+              {/* Tümünü Temizle Butonu */}
+              {suggestions.length > 0 && (
+                <div className="border-t border-slate-200 p-3">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (confirm("Tüm önerileri silmek istediğine emin misin?")) {
+                        for (const sugg of suggestions) {
+                          await deleteSuggestion(sugg.id);
+                        }
+                      }
+                    }}
+                    className="w-full px-3 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded border border-red-200 transition-colors"
+                  >
+                    🗑 Tümünü Temizle
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>
