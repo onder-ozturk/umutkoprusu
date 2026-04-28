@@ -103,6 +103,30 @@ function extractBearer(request: Request): string | null {
   return match ? match[1].trim() : null;
 }
 
+async function recordAuthLog(
+  env: Env,
+  request: Request,
+  email: string | null,
+  success: boolean,
+  reason: string
+): Promise<void> {
+  try {
+    const ip =
+      request.headers.get('CF-Connecting-IP') ||
+      request.headers.get('X-Forwarded-For') ||
+      null;
+    const country = request.headers.get('CF-IPCountry') || null;
+    const userAgent = request.headers.get('User-Agent') || null;
+    await env.DB.prepare(
+      'INSERT INTO auth_logs (email, success, reason, ip, country, user_agent, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    )
+      .bind(email, success ? 1 : 0, reason, ip, country, userAgent, Date.now())
+      .run();
+  } catch (err) {
+    console.error('auth log insert failed', err);
+  }
+}
+
 export default {
   async fetch(request: Request, env: Env) {
     const url = new URL(request.url);
@@ -114,23 +138,28 @@ export default {
 
     // ── AUTH ────────────────────────────────────────────────────────────
     if (method === 'POST' && url.pathname === '/api/auth/login') {
+      let attemptedEmail: string | null = null;
       try {
         const { email, password } = (await request.json()) as { email?: string; password?: string };
+        attemptedEmail = email ? email.toLowerCase().trim() : null;
         if (!email || !password) {
+          await recordAuthLog(env, request, attemptedEmail, false, 'missing_fields');
           return jsonResponse({ error: 'E-posta ve şifre gerekli.' }, 400);
         }
         const user = await env.DB.prepare(
           'SELECT email, password_hash, password_salt, password_iterations FROM users WHERE email = ?'
         )
-          .bind(email.toLowerCase().trim())
+          .bind(attemptedEmail)
           .first<UserRow>();
         if (!user) {
+          await recordAuthLog(env, request, attemptedEmail, false, 'user_not_found');
           return jsonResponse({ error: 'E-posta veya şifre hatalı.' }, 401);
         }
         const salt = base64ToBytes(user.password_salt);
         const expected = base64ToBytes(user.password_hash);
         const computed = await pbkdf2Hash(password, salt, user.password_iterations);
         if (!timingSafeEqual(expected, computed)) {
+          await recordAuthLog(env, request, attemptedEmail, false, 'wrong_password');
           return jsonResponse({ error: 'E-posta veya şifre hatalı.' }, 401);
         }
 
@@ -142,9 +171,11 @@ export default {
         )
           .bind(token, user.email, expires, now)
           .run();
+        await recordAuthLog(env, request, user.email, true, 'ok');
         return jsonResponse({ token, email: user.email, expires_at: expires });
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error';
+        await recordAuthLog(env, request, attemptedEmail, false, 'error');
         return jsonResponse({ error: 'Giriş başarısız.', details: message }, 500);
       }
     }

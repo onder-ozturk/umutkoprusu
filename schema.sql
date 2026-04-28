@@ -24,3 +24,18 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 CREATE INDEX IF NOT EXISTS idx_sessions_email ON sessions(email);
 CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at);
+
+CREATE TABLE IF NOT EXISTS auth_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT,
+  success INTEGER NOT NULL,
+  reason TEXT NOT NULL,
+  ip TEXT,
+  country TEXT,
+  user_agent TEXT,
+  timestamp INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_auth_logs_timestamp ON auth_logs(timestamp);
+CREATE INDEX IF NOT EXISTS idx_auth_logs_email ON auth_logs(email);
+CREATE INDEX IF NOT EXISTS idx_auth_logs_success ON auth_logs(success);
