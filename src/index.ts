@@ -194,6 +194,61 @@ export default {
       return jsonResponse({ success: true });
     }
 
+    if (method === 'GET' && url.pathname === '/api/auth/logs') {
+      const session = await verifyToken(env, extractBearer(request));
+      if (!session) return jsonResponse({ error: 'Yetkisiz.' }, 401);
+
+      const limitRaw = parseInt(url.searchParams.get('limit') || '50', 10);
+      const offsetRaw = parseInt(url.searchParams.get('offset') || '0', 10);
+      const limit = Math.min(Math.max(Number.isFinite(limitRaw) ? limitRaw : 50, 1), 200);
+      const offset = Math.max(Number.isFinite(offsetRaw) ? offsetRaw : 0, 0);
+
+      const successParam = url.searchParams.get('success');
+      const emailParam = url.searchParams.get('email');
+      const reasonParam = url.searchParams.get('reason');
+
+      const conditions: string[] = [];
+      const bindings: (string | number)[] = [];
+      if (successParam === '0' || successParam === '1') {
+        conditions.push('success = ?');
+        bindings.push(parseInt(successParam, 10));
+      }
+      if (emailParam && emailParam.trim()) {
+        conditions.push('email LIKE ?');
+        bindings.push(`%${emailParam.trim().toLowerCase()}%`);
+      }
+      if (reasonParam && reasonParam.trim()) {
+        conditions.push('reason = ?');
+        bindings.push(reasonParam.trim());
+      }
+      const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+
+      try {
+        const countResult = await env.DB.prepare(
+          `SELECT COUNT(*) AS total FROM auth_logs ${where}`
+        )
+          .bind(...bindings)
+          .first<{ total: number }>();
+        const rows = await env.DB.prepare(
+          `SELECT id, email, success, reason, ip, country, user_agent, timestamp
+           FROM auth_logs ${where}
+           ORDER BY id DESC
+           LIMIT ? OFFSET ?`
+        )
+          .bind(...bindings, limit, offset)
+          .all();
+        return jsonResponse({
+          logs: rows.results || [],
+          total: countResult?.total ?? 0,
+          limit,
+          offset,
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        return jsonResponse({ error: 'Loglar okunamadı.', details: message }, 500);
+      }
+    }
+
     // ── SUGGESTIONS ─────────────────────────────────────────────────────
     if (method === 'GET' && url.pathname === '/api/suggestions') {
       try {

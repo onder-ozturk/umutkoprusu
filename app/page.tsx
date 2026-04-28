@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { timelineDetails, timelineDetailsRich, type Section } from "./timelineDetails";
 import LoginScreen from "./LoginScreen";
+import AuthLogsPanel from "./AuthLogsPanel";
 
 const AUTH_STORAGE_KEY = "affectlog_auth";
 
@@ -843,6 +844,7 @@ export default function Home() {
   const [authChecked, setAuthChecked] = useState(false);
   const [authUser, setAuthUser] = useState<string | null>(null);
   const [authToken, setAuthToken] = useState<string | null>(null);
+  const [showAuthLogs, setShowAuthLogs] = useState(false);
   const [selected, setSelected] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeDetail, setActiveDetail] = useState<ItemDetail | null>(null);
@@ -1178,6 +1180,16 @@ export default function Home() {
                 <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
                 {authUser}
               </span>
+              <button
+                onClick={() => setShowAuthLogs(true)}
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-md transition-colors"
+                aria-label="Giriş kayıtları"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Giriş Kayıtları
+              </button>
               <button
                 onClick={handleLogout}
                 className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-md transition-colors"
@@ -2074,6 +2086,14 @@ export default function Home() {
           )}
         </div>
       </div>
+
+      {showAuthLogs && authToken && (
+        <AuthLogsPanel
+          apiUrl={API_URL}
+          token={authToken}
+          onClose={() => setShowAuthLogs(false)}
+        />
+      )}
     </div>
   );
 }
