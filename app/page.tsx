@@ -1,6 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { timelineDetails, timelineDetailsRich, type Section } from "./timelineDetails";
+import LoginScreen from "./LoginScreen";
+
+const AUTH_STORAGE_KEY = "affectlog_auth_user";
 
 type UpgradeNote = { category: string; note: string };
 type Suggestion = { id: string; itemText: string; category: string; period: string; suggestion: string; timestamp: number };
@@ -807,6 +810,8 @@ const removeSuggestion = async (id: string): Promise<boolean> => {
 };
 
 export default function Home() {
+  const [authChecked, setAuthChecked] = useState(false);
+  const [authUser, setAuthUser] = useState<string | null>(null);
   const [selected, setSelected] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeDetail, setActiveDetail] = useState<ItemDetail | null>(null);
@@ -903,21 +908,53 @@ export default function Home() {
   };
 
   useEffect(() => {
+    try {
+      const stored = typeof window !== "undefined" ? window.localStorage.getItem(AUTH_STORAGE_KEY) : null;
+      if (stored) setAuthUser(stored);
+    } catch {
+      // localStorage erişilemezse oturum açık değil sayılır
+    }
+    setAuthChecked(true);
+  }, []);
+
+  const handleLogin = (username: string) => {
+    try {
+      window.localStorage.setItem(AUTH_STORAGE_KEY, username);
+    } catch {
+      // sessizce devam
+    }
+    setAuthUser(username);
+  };
+
+  const handleLogout = () => {
+    try {
+      window.localStorage.removeItem(AUTH_STORAGE_KEY);
+    } catch {
+      // sessizce devam
+    }
+    setAuthUser(null);
+    setSidebarOpen(false);
+    closeDetail();
+  };
+
+  useEffect(() => {
+    if (!authUser) return;
     const fetchSuggestions = async () => {
       const data = await loadSuggestions();
       setSuggestions(data);
     };
     fetchSuggestions();
-  }, []);
+  }, [authUser]);
 
   // Polling: Her 3 saniyede önerileri kontrol et
   useEffect(() => {
+    if (!authUser) return;
     const interval = setInterval(async () => {
       const data = await loadSuggestions();
       setSuggestions(data);
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [authUser]);
 
   useEffect(() => {
     if (!activeDetail) return;
@@ -936,6 +973,14 @@ export default function Home() {
     setSidebarOpen(false);
     closeDetail();
   };
+
+  if (!authChecked) {
+    return <div className="min-h-screen bg-gray-50" aria-hidden="true" />;
+  }
+
+  if (!authUser) {
+    return <LoginScreen onLogin={handleLogin} />;
+  }
 
   return (
     <div className="flex h-screen bg-gray-50 font-sans overflow-hidden">
@@ -1053,6 +1098,22 @@ export default function Home() {
               <span><span className="font-medium text-gray-700">Bitiş:</span> 05.12.2027</span>
               <span><span className="font-medium text-gray-700">Yönetici:</span> Önder Öztürk</span>
               <span><span className="font-medium text-gray-700">Bütçe:</span> 4.092.000 TL</span>
+            </div>
+            <div className="flex items-center gap-2 ml-auto">
+              <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                {authUser}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-md transition-colors"
+                aria-label="Çıkış yap"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Çıkış
+              </button>
             </div>
           </div>
         </header>
