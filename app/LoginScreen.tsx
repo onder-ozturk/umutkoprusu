@@ -16,16 +16,16 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
     setError("");
 
     if (!username.trim() || !password.trim()) {
-      setError("Kullanıcı adı ve şifre gerekli.");
+      setError("E-posta ve şifre gerekli.");
       return;
     }
 
     setLoading(true);
     setTimeout(() => {
-      if (username === "admin" && password === "admin") {
+      if (username === "onder.ozturk@ksbu.edu.tr" && password === "ooO.5062") {
         onLogin(username);
       } else {
-        setError("Kullanıcı adı veya şifre hatalı.");
+        setError("E-posta veya şifre hatalı.");
         setLoading(false);
       }
     }, 400);
@@ -54,17 +54,17 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1.5">
-                Kullanıcı Adı
+                E-posta
               </label>
               <input
                 id="username"
-                type="text"
+                type="email"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={loading}
                 autoComplete="username"
                 className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
-                placeholder="admin"
+                placeholder="ad.soyad@kurum.edu.tr"
               />
             </div>
 
@@ -99,11 +99,6 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-gray-100">
-            <p className="text-xs text-gray-500 text-center">
-              Demo erişim: <span className="font-mono font-semibold text-gray-700">admin</span> / <span className="font-mono font-semibold text-gray-700">admin</span>
-            </p>
-          </div>
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">
