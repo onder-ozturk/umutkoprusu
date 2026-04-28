@@ -1,34 +1,33 @@
 "use client";
 import { useState } from "react";
 
+type LoginResult = { ok: true } | { ok: false; error: string };
+
 type LoginScreenProps = {
-  onLogin: (username: string) => void;
+  onLogin: (email: string, password: string) => Promise<LoginResult>;
 };
 
 export default function LoginScreen({ onLogin }: LoginScreenProps) {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!username.trim() || !password.trim()) {
+    if (!email.trim() || !password.trim()) {
       setError("E-posta ve şifre gerekli.");
       return;
     }
 
     setLoading(true);
-    setTimeout(() => {
-      if (username === "onder.ozturk@ksbu.edu.tr" && password === "ooO.5062") {
-        onLogin(username);
-      } else {
-        setError("E-posta veya şifre hatalı.");
-        setLoading(false);
-      }
-    }, 400);
+    const result = await onLogin(email.trim(), password);
+    if (!result.ok) {
+      setError(result.error);
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,14 +52,14 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
                 E-posta
               </label>
               <input
-                id="username"
+                id="email"
                 type="email"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
                 autoComplete="username"
                 className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
@@ -98,7 +97,6 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
             </button>
           </form>
-
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">

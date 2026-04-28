@@ -3,7 +3,31 @@ import { useEffect, useState } from "react";
 import { timelineDetails, timelineDetailsRich, type Section } from "./timelineDetails";
 import LoginScreen from "./LoginScreen";
 
-const AUTH_STORAGE_KEY = "affectlog_auth_user";
+const AUTH_STORAGE_KEY = "affectlog_auth";
+
+type StoredAuth = { email: string; token: string };
+
+const readStoredAuth = (): StoredAuth | null => {
+  try {
+    if (typeof window === "undefined") return null;
+    const raw = window.localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredAuth;
+    if (!parsed?.email || !parsed?.token) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+};
+
+const writeStoredAuth = (value: StoredAuth | null) => {
+  try {
+    if (value) window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(value));
+    else window.localStorage.removeItem(AUTH_STORAGE_KEY);
+  } catch {
+    // sessizce devam
+  }
+};
 
 type UpgradeNote = { category: string; note: string };
 type Suggestion = { id: string; itemText: string; category: string; period: string; suggestion: string; timestamp: number };
@@ -764,11 +788,17 @@ const loadSuggestions = async (): Promise<Suggestion[]> => {
   }
 };
 
-const addSuggestion = async (suggestion: Omit<Suggestion, "id">): Promise<Suggestion | null> => {
+const authHeaders = (token: string | null): Record<string, string> => {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  return headers;
+};
+
+const addSuggestion = async (suggestion: Omit<Suggestion, "id">, token: string | null): Promise<Suggestion | null> => {
   try {
     const response = await fetch(`${API_URL}/api/suggestions`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders(token),
       body: JSON.stringify(suggestion),
     });
     if (!response.ok) throw new Error("Failed to save suggestion");
@@ -779,11 +809,11 @@ const addSuggestion = async (suggestion: Omit<Suggestion, "id">): Promise<Sugges
   }
 };
 
-const updateSuggestion = async (id: string, suggestion: string): Promise<Suggestion | null> => {
+const updateSuggestion = async (id: string, suggestion: string, token: string | null): Promise<Suggestion | null> => {
   try {
     const response = await fetch(`${API_URL}/api/suggestions`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders(token),
       body: JSON.stringify({ id, suggestion }),
     });
     if (!response.ok) throw new Error("Failed to update suggestion");
@@ -794,11 +824,11 @@ const updateSuggestion = async (id: string, suggestion: string): Promise<Suggest
   }
 };
 
-const removeSuggestion = async (id: string): Promise<boolean> => {
+const removeSuggestion = async (id: string, token: string | null): Promise<boolean> => {
   try {
     const response = await fetch(`${API_URL}/api/suggestions`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders(token),
       body: JSON.stringify({ id }),
     });
     if (!response.ok) throw new Error("Failed to delete suggestion");
@@ -812,6 +842,7 @@ const removeSuggestion = async (id: string): Promise<boolean> => {
 export default function Home() {
   const [authChecked, setAuthChecked] = useState(false);
   const [authUser, setAuthUser] = useState<string | null>(null);
+  const [authToken, setAuthToken] = useState<string | null>(null);
   const [selected, setSelected] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeDetail, setActiveDetail] = useState<ItemDetail | null>(null);
@@ -853,7 +884,7 @@ export default function Home() {
       suggestion: newSuggestionText,
       timestamp: Date.now(),
     };
-    const result = await addSuggestion(newSugg);
+    const result = await addSuggestion(newSugg, authToken);
     if (result) {
       setSuggestions([...suggestions, result]);
       setShowSuggestionModal(false);
@@ -871,7 +902,7 @@ export default function Home() {
   };
 
   const deleteSuggestion = async (id: string) => {
-    const success = await removeSuggestion(id);
+    const success = await removeSuggestion(id, authToken);
     if (success) {
       const updated = suggestions.filter((s) => s.id !== id);
       setSuggestions(updated);
@@ -886,7 +917,7 @@ export default function Home() {
 
   const saveEditSuggestion = async (id: string) => {
     if (!editingText.trim()) return;
-    const result = await updateSuggestion(id, editingText);
+    const result = await updateSuggestion(id, editingText, authToken);
     if (result) {
       const updated = suggestions.map((s) =>
         s.id === id ? { ...s, suggestion: editingText } : s
@@ -908,36 +939,76 @@ export default function Home() {
   };
 
   useEffect(() => {
-    queueMicrotask(() => {
-      let stored: string | null = null;
-      try {
-        stored = typeof window !== "undefined" ? window.localStorage.getItem(AUTH_STORAGE_KEY) : null;
-      } catch {
-        // localStorage erişilemezse oturum açık değil sayılır
+    let cancelled = false;
+    (async () => {
+      const stored = readStoredAuth();
+      if (!stored) {
+        if (!cancelled) setAuthChecked(true);
+        return;
       }
-      if (stored) setAuthUser(stored);
-      setAuthChecked(true);
-    });
+      try {
+        const response = await fetch(`${API_URL}/api/auth/verify`, {
+          headers: { Authorization: `Bearer ${stored.token}` },
+        });
+        if (cancelled) return;
+        if (response.ok) {
+          setAuthUser(stored.email);
+          setAuthToken(stored.token);
+        } else {
+          writeStoredAuth(null);
+        }
+      } catch {
+        // ağ hatasında oturumu yerelde tutalım, kullanıcı yine giriş yapabilsin
+        if (!cancelled) {
+          setAuthUser(stored.email);
+          setAuthToken(stored.token);
+        }
+      } finally {
+        if (!cancelled) setAuthChecked(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const handleLogin = (username: string) => {
+  const handleLogin = async (email: string, password: string) => {
     try {
-      window.localStorage.setItem(AUTH_STORAGE_KEY, username);
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = (await response.json().catch(() => ({}))) as { token?: string; email?: string; error?: string };
+      if (!response.ok || !data.token || !data.email) {
+        return { ok: false as const, error: data.error || "Giriş başarısız." };
+      }
+      writeStoredAuth({ email: data.email, token: data.token });
+      setAuthUser(data.email);
+      setAuthToken(data.token);
+      return { ok: true as const };
     } catch {
-      // sessizce devam
+      return { ok: false as const, error: "Sunucuya ulaşılamadı." };
     }
-    setAuthUser(username);
   };
 
-  const handleLogout = () => {
-    try {
-      window.localStorage.removeItem(AUTH_STORAGE_KEY);
-    } catch {
-      // sessizce devam
-    }
+  const handleLogout = async () => {
+    const token = authToken;
+    writeStoredAuth(null);
     setAuthUser(null);
+    setAuthToken(null);
     setSidebarOpen(false);
     closeDetail();
+    if (token) {
+      try {
+        await fetch(`${API_URL}/api/auth/logout`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch {
+        // sessizce devam
+      }
+    }
   };
 
   useEffect(() => {
