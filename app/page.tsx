@@ -908,13 +908,16 @@ export default function Home() {
   };
 
   useEffect(() => {
-    try {
-      const stored = typeof window !== "undefined" ? window.localStorage.getItem(AUTH_STORAGE_KEY) : null;
+    queueMicrotask(() => {
+      let stored: string | null = null;
+      try {
+        stored = typeof window !== "undefined" ? window.localStorage.getItem(AUTH_STORAGE_KEY) : null;
+      } catch {
+        // localStorage erişilemezse oturum açık değil sayılır
+      }
       if (stored) setAuthUser(stored);
-    } catch {
-      // localStorage erişilemezse oturum açık değil sayılır
-    }
-    setAuthChecked(true);
+      setAuthChecked(true);
+    });
   }, []);
 
   const handleLogin = (username: string) => {
